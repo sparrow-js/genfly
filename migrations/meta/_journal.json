@@ -8,6 +8,20 @@
       "when": 1741927129417,
       "tag": "0000_watery_wind_dancer",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1741959867581,
+      "tag": "0001_wet_moondragon",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1741960341238,
+      "tag": "0002_far_meltdown",
+      "breakpoints": true
     }
   ]
 }

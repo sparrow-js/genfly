@@ -1,0 +1,52 @@
+import NextAuth from "next-auth"
+import "next-auth/jwt"
+
+import GitHub from "next-auth/providers/github"
+import Google from "next-auth/providers/google"
+import { DrizzleAdapter } from "@auth/drizzle-adapter"
+import { getDb } from "@/db"
+
+
+export const { handlers, auth, signIn, signOut } = NextAuth({
+  debug: !!process.env.AUTH_DEBUG,
+  theme: { logo: "https://authjs.dev/img/logo-sm.png" },
+  adapter: DrizzleAdapter(getDb()),
+  providers: [
+    GitHub,
+    Google,
+  ],
+  basePath: "/api/auth",
+  session: { strategy: "jwt" },
+  callbacks: {
+    authorized({ request, auth }) {
+      const { pathname } = request.nextUrl
+      if (pathname === "/middleware-example") return !!auth
+      return true
+    },
+    jwt({ token, trigger, session, account }) {
+      if (trigger === "update") token.name = session.user.name
+      if (account?.provider === "keycloak") {
+        return { ...token, accessToken: account.access_token }
+      }
+      return token
+    },
+    async session({ session, token }) {
+      if (token?.accessToken) session.accessToken = token.accessToken
+
+      return session
+    },
+  },
+  experimental: { enableWebAuthn: true },
+})
+
+declare module "next-auth" {
+  interface Session {
+    accessToken?: string
+  }
+}
+
+declare module "next-auth/jwt" {
+  interface JWT {
+    accessToken?: string
+  }
+}
