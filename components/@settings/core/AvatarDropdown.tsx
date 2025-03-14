@@ -4,6 +4,8 @@ import { useStore } from '@nanostores/react';
 import { classNames } from '@/utils/classNames';
 import { profileStore } from '@/lib/stores/profile';
 import type { TabType, Profile } from './types';
+import { useSession } from "next-auth/react"
+
 
 const BetaLabel = () => (
   <span className="px-1.5 py-0.5 rounded-full bg-purple-500/10 dark:bg-purple-500/20 text-[10px] font-medium text-purple-600 dark:text-purple-400 ml-2">
@@ -17,6 +19,7 @@ interface AvatarDropdownProps {
 
 export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
   const profile = useStore(profileStore) as Profile;
+  const { data: session, status } = useSession();
 
   return (
     <DropdownMenu.Root>
@@ -26,10 +29,10 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
         >
-          {profile?.avatar ? (
+          {session?.user?.image ? (
             <img
-              src={profile.avatar}
-              alt={profile?.username || 'Profile'}
+              src={session?.user?.image}
+              alt={session?.user?.name || 'Profile'}
               className="w-full h-full rounded-full object-cover"
               loading="eager"
               decoding="sync"
@@ -62,10 +65,10 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
             )}
           >
             <div className="w-10 h-10 rounded-full overflow-hidden flex-shrink-0 bg-white dark:bg-gray-800 shadow-sm">
-              {profile?.avatar ? (
+              {session?.user?.image ? (
                 <img
-                  src={profile.avatar}
-                  alt={profile?.username || 'Profile'}
+                  src={session?.user?.image}
+                  alt={session?.user?.name || 'Profile'}
                   className={classNames('w-full h-full', 'object-cover', 'transform-gpu', 'image-rendering-crisp')}
                   loading="eager"
                   decoding="sync"
@@ -78,9 +81,9 @@ export const AvatarDropdown = ({ onSelectTab }: AvatarDropdownProps) => {
             </div>
             <div className="flex-1 min-w-0">
               <div className="font-medium text-sm text-gray-900 dark:text-white truncate">
-                {profile?.username || 'Guest User'}
+                {session?.user?.name || 'Guest User'}
               </div>
-              {profile?.bio && <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{profile.bio}</div>}
+              {/* {session?.user?.bio && <div className="text-xs text-gray-500 dark:text-gray-400 truncate">{session?.user?.bio}</div>} */}
             </div>
           </div>
 

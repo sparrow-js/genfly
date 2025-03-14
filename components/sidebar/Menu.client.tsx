@@ -14,6 +14,8 @@ import { useSearchFilter } from '@/lib/hooks/useSearchFilter';
 import { classNames } from '@/utils/classNames';
 import { useStore } from '@nanostores/react';
 import { profileStore } from '@/lib/stores/profile';
+import { useSession } from "next-auth/react"
+
 
 const menuVariants = {
   closed: {
@@ -73,6 +75,10 @@ export const Menu = () => {
     items: list,
     searchFields: ['description'],
   });
+
+  const { data: session, status } = useSession();
+  
+
 
   const loadEntries = useCallback(async () => {
     try {
@@ -224,13 +230,13 @@ export const Menu = () => {
           <div className="text-gray-900 dark:text-white font-medium"></div>
           <div className="flex items-center gap-3">
             <span className="font-medium text-sm text-gray-900 dark:text-white truncate">
-              {profile?.username || 'Guest User'}
+              {session?.user?.name || 'Guest User'}
             </span>
             <div className="flex items-center justify-center w-[32px] h-[32px] overflow-hidden bg-white dark:bg-gray-800 text-gray-600 dark:text-gray-500 rounded-full shrink-0">
-              {profile?.avatar ? (
+              {session?.user?.image ? (
                 <img
-                  src={profile.avatar}
-                  alt={profile?.username || 'User'}
+                  src={session?.user?.image}
+                  alt={session?.user?.name || 'User'}
                   className="w-full h-full object-cover"
                   loading="eager"
                   decoding="sync"
