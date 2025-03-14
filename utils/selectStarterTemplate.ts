@@ -103,7 +103,7 @@ const getGitHubRepoContent = async (
   const baseUrl = 'https://api.github.com';
 
   try {
-    const token = Cookies.get('githubToken') || process.env.GITHUB_TOKEN;
+    const token = Cookies.get('githubToken') || process.env.NEXT_PUBLIC_GITHUB_TOKEN;
 
     const headers: HeadersInit = {
       Accept: 'application/vnd.github.v3+json',

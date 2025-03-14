@@ -1,15 +1,15 @@
-'use client';
 
-import { useEffect } from 'react';
-import dynamic from 'next/dynamic';
+
+
 import { Header } from '@/components/header/Header';
 import { BaseChat } from '@/components/chat/BaseChat';
 import { Suspense } from 'react';
+import { Chat } from '@/components/chat/Chat.client';
 
 // Client-side only components
-const Chat = dynamic(() => import('@/components/chat/Chat.client').then(mod => mod.Chat), {
-  ssr: false,
-});
+// const Chat = dynamic(() => import('@/components/chat/Chat.client').then(mod => mod.Chat), {
+//   ssr: false,
+// });
 
 /**
  * Landing page component for genfly
@@ -27,7 +27,7 @@ export default function Home() {
         title="background"
       />
       <Header />
-      <Suspense fallback={<BaseChat />}>
+      <Suspense fallback={<div>loading...</div>}>
         <Chat />
       </Suspense>
     </div>

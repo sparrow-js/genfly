@@ -15,6 +15,8 @@ import { extractPropertiesFromMessage } from '@/lib/.server/llm/utils';
 
 const logger = createScopedLogger('api.chat');
 
+export const runtime = 'edge';
+
 function parseCookies(cookieHeader: string | null): Record<string, string> {
   const cookies: Record<string, string> = {};
   if (!cookieHeader) return cookies;

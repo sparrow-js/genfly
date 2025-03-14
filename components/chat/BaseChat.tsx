@@ -1,10 +1,11 @@
+'use client';
+
 /*
  * @ts-nocheck
  * Preventing TS checks with files presented in the video for a better presentation.
  */
 import type { JSONValue, Message } from 'ai';
 import React, { type RefCallback, useEffect, useState } from 'react';
-import { ClientOnly } from 'remix-utils/client-only';
 import { Menu } from '@/components/sidebar/Menu.client';
 import { IconButton } from '@/components/ui/IconButton';
 import { Workbench } from '@/components/workbench/Workbench.client';
@@ -35,6 +36,7 @@ import type { ModelInfo } from '@/lib/modules/llm/types';
 import ProgressCompilation from './ProgressCompilation';
 import type { ProgressAnnotation } from '@/types/context';
 import { LOCAL_PROVIDERS } from '@/lib/stores/settings';
+import { ClientOnly } from '@/components/ClientOnly';
 
 const TEXTAREA_MIN_HEIGHT = 76;
 
@@ -303,7 +305,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
         className={classNames(styles.BaseChat, 'relative flex h-full w-full overflow-hidden')}
         data-chat-visible={showChat}
       >
-        <ClientOnly>{() => <Menu />}</ClientOnly>
+        <Menu />
         <div className="flex flex-col lg:flex-row overflow-y-auto w-full h-full">
           <div className={classNames(styles.Chat, 'flex flex-col flex-grow lg:min-w-[var(--chat-min-width)] h-full')}>
             {!chatStarted && (
@@ -322,20 +324,16 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
               })}
               ref={scrollRef}
             >
-              <ClientOnly>
-                {() => {
-                  return chatStarted ? (
-                    <div className="flex-1 w-full max-w-chat pb-6 mx-auto z-1">
-                      <Messages
-                        ref={messageRef}
-                        className="flex flex-col "
-                        messages={messages}
-                        isStreaming={isStreaming}
-                      />
-                    </div>
-                  ) : null;
-                }}
-              </ClientOnly>
+              {chatStarted ? (
+                <div className="flex-1 w-full max-w-chat pb-6 mx-auto z-1">
+                  <Messages
+                    ref={messageRef}
+                    className="flex flex-col "
+                    messages={messages}
+                    isStreaming={isStreaming}
+                  />
+                </div>
+              ) : null}
               <div
                 className={classNames('flex flex-col gap-4 w-full max-w-chat mx-auto z-prompt', {
                   'sticky bottom-2': chatStarted,
@@ -391,9 +389,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                     <rect className={classNames(styles.PromptShine)} x="48" y="24" width="70" height="1"></rect>
                   </svg>
                   <div>
-                    <ClientOnly>
-                      {() => (
-                        <div className={isModelSettingsCollapsed ? 'hidden' : ''}>
+                    <div className={isModelSettingsCollapsed ? 'hidden' : ''}>
                           <ModelSelector
                             key={provider?.name + ':' + modelList.length}
                             model={model}
@@ -415,8 +411,6 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                             />
                           )} */}
                         </div>
-                      )}
-                    </ClientOnly>
                   </div>
                   <FilePreview
                     files={uploadedFiles}
@@ -426,16 +420,12 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                       setImageDataList?.(imageDataList.filter((_, i) => i !== index));
                     }}
                   />
-                  <ClientOnly>
-                    {() => (
-                      <ScreenshotStateManager
-                        setUploadedFiles={setUploadedFiles}
-                        setImageDataList={setImageDataList}
-                        uploadedFiles={uploadedFiles}
-                        imageDataList={imageDataList}
-                      />
-                    )}
-                  </ClientOnly>
+                  <ScreenshotStateManager
+                      setUploadedFiles={setUploadedFiles}
+                      setImageDataList={setImageDataList}
+                      uploadedFiles={uploadedFiles}
+                      imageDataList={imageDataList}
+                    />
                   <div
                     className={classNames(
                       'relative shadow-xs border border-bolt-elements-borderColor backdrop-blur rounded-lg',
@@ -511,9 +501,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                       placeholder="How can Bolt help you today?"
                       translate="no"
                     />
-                    <ClientOnly>
-                      {() => (
-                        <SendButton
+                      <SendButton
                           show={input.length > 0 || isStreaming || uploadedFiles.length > 0}
                           isStreaming={isStreaming}
                           disabled={!providerList || providerList.length === 0}
@@ -528,8 +516,6 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                             }
                           }}
                         />
-                      )}
-                    </ClientOnly>
                     <div className="flex justify-between items-center text-sm p-4 pt-2">
                       <div className="flex gap-1 items-center">
                         <IconButton title="Upload file" className="transition-all" onClick={() => handleFileUpload()}>
@@ -557,7 +543,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                           onStop={stopListening}
                           disabled={isStreaming}
                         /> */}
-                        {chatStarted && <ClientOnly>{() => <ExportChatButton exportChat={exportChat} />}</ClientOnly>}
+                        {chatStarted && <ExportChatButton exportChat={exportChat} />}
                         <IconButton
                           title="Model Settings"
                           className={classNames('transition-all flex items-center gap-1', {
@@ -570,7 +556,11 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                           disabled={!providerList || providerList.length === 0}
                         >
                           <div className={`i-ph:caret-${isModelSettingsCollapsed ? 'right' : 'down'} text-lg`} />
-                          {isModelSettingsCollapsed ? <span className="text-xs">{model}</span> : <span />}
+                          {isModelSettingsCollapsed ? (
+                            <ClientOnly>
+                              {() => <span className="text-xs">{model}</span>}
+                            </ClientOnly>
+                          ) : null}
                         </IconButton>
                       </div>
                       {input.length > 3 ? (
@@ -606,7 +596,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
               </div>
             )}
           </div>
-          <ClientOnly>{() => <Workbench chatStarted={chatStarted} isStreaming={isStreaming} sendMessage={sendMessage} />}</ClientOnly>
+          <Workbench chatStarted={chatStarted} isStreaming={isStreaming} sendMessage={sendMessage} />
         </div>
       </div>
     );

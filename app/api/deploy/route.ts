@@ -4,7 +4,7 @@ import { createScopedLogger } from '@/utils/logger';
 import { deployApp } from '@/utils/machines';
 
 const logger = createScopedLogger('api.deploy');
-
+export const runtime = 'edge';
 export async function POST(request: Request) {
   try {
     const data: { appName: string } = await request.json();

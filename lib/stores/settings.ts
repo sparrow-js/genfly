@@ -1,3 +1,4 @@
+'use client';
 import { atom, map } from 'nanostores';
 import { PROVIDER_LIST } from '@/utils/constants';
 import type { IProviderConfig } from '@/types/model';

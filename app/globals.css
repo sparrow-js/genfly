@@ -17,3 +17,13 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+[data-theme="dark"] body {
+  background: #0a0a0a;
+}
+
+[data-theme="light"] body {
+  background: #ffffff;
+}
+
+

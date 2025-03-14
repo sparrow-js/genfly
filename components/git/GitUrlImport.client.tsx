@@ -1,8 +1,9 @@
+'use client';
+
 import { useSearchParams } from 'next/navigation';
 import { generateId, type Message } from 'ai';
 import ignore from 'ignore';
 import { useEffect, useState } from 'react';
-import { ClientOnly } from 'remix-utils/client-only';
 import { BaseChat } from '@/components/chat/BaseChat';
 import { Chat } from '@/components/chat/Chat.client';
 import { useGit } from '@/lib/hooks/useGit';
@@ -10,6 +11,7 @@ import { useChatHistory } from '@/lib/persistence';
 import { createCommandsMessage, detectProjectCommands, escapeBoltTags } from '@/utils/projectCommands';
 import { LoadingOverlay } from '@/components/ui/LoadingOverlay';
 import { toast } from 'react-toastify';
+import { Suspense } from 'react';
 
 const IGNORE_PATTERNS = [
   'node_modules/**',
@@ -134,13 +136,9 @@ ${escapeBoltTags(file.content)}
   }, [searchParams, historyReady, gitReady, imported]);
 
   return (
-    <ClientOnly fallback={<BaseChat />}>
-      {() => (
-        <>
-          <Chat />
-          {loading && <LoadingOverlay message="Please wait while we clone the repository..." />}
-        </>
-      )}
-    </ClientOnly>
+    <Suspense fallback={<BaseChat />}>
+      <Chat />
+      {loading && <LoadingOverlay message="Please wait while we clone the repository..." />}
+    </Suspense>
   );
 }

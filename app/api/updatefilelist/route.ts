@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { updateFileList } from '@/utils/machines';
 
+export const runtime = 'edge';
 export async function POST(request: Request) {
   try {
     // Parse the request body
