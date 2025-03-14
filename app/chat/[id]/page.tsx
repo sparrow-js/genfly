@@ -4,14 +4,15 @@ import { useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { Header } from '@/components/header/Header';
 import { BaseChat } from '@/components/chat/BaseChat';
+import { Chat } from '@/components/chat/Chat.client';
 import { Suspense } from 'react';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // Client-side only components
-const Chat = dynamic(() => import('@/components/chat/Chat.client').then(mod => mod.Chat), {
-  ssr: false,
-});
+// const Chat = dynamic(() => import('@/components/chat/Chat.client').then(mod => mod.Chat), {
+//   ssr: false,
+// });
 
 /**
  * Landing page component for genfly
