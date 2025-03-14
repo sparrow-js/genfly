@@ -83,7 +83,7 @@ export default class OpenAIProvider extends BaseProvider {
     }
 
     const openai = createOpenAI({
-      apiKey: 'sk-AQr4oRAh4soDE7KvrkB2MmTL5O7zeCf7z1QzmhwflD10flIr',
+      apiKey: process.env.OPENAI_API_KEY,
       baseURL: 'https://api.openai-proxy.org/v1',
     });
 

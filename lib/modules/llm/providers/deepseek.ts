@@ -39,7 +39,7 @@ export default class DeepseekProvider extends BaseProvider {
     }
 
     const deepseek = createDeepSeek({
-      apiKey: "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",
+      apiKey: process.env.DEEPSEEK_API_KEY,
       baseURL: 'https://openrouter.ai/api/v1',
     });
 

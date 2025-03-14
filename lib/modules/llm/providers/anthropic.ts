@@ -58,7 +58,7 @@ export default class AnthropicProvider extends BaseProvider {
     // });
 
     const anthropic = createAnthropic({
-      apiKey: "sk-AQr4oRAh4soDE7KvrkB2MmTL5O7zeCf7z1QzmhwflD10flIr",
+      apiKey: process.env.ANTHROPIC_API_KEY,
       baseUrl: 'https://api.openai-proxy.org/anthropic/v1',
     });
 
