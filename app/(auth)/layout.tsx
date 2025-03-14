@@ -1,14 +1,18 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import { auth } from "auth"
+import { SessionProvider } from "next-auth/react"
 
 export const metadata: Metadata = {
   title: "Login | Platforms Starter Kit",
 };
 
-export default function AuthLayout({ children }: { children: ReactNode }) {
+export default async function AuthLayout({ children }: { children: ReactNode }) {
+  const session = await auth();
   return (
-    <div className="flex min-h-screen flex-col justify-center py-12 sm:px-6 lg:px-8">
-      {children}
-    </div>
+    <SessionProvider basePath={"/api/auth"} session={session}>
+       {children}
+    </SessionProvider>
+   
   );
 }
