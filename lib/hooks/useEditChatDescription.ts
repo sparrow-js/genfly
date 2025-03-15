@@ -118,7 +118,7 @@ export function useEditChatDescription({
       }
 
       try {
-        const response = await fetch(`/api/chats/${chatId}/description`, {
+        const response = await fetch(`/api/chats/${chatId}/update`, {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json',

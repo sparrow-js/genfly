@@ -5,7 +5,7 @@ import { chats } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import type { Message } from 'ai';
 import type { IChatMetadata } from '@/lib/persistence/types';
-
+import { auth } from 'auth';
 export async function GET(request: Request) {
     try {
         const allChats = await withDb(db => db.select().from(chats));
@@ -17,6 +17,11 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
+  const session = await auth();
+  if (!session?.user) {
+    return new NextResponse("Unauthorized", { status: 401 });
+  }
+
   const { id, messages, urlId, description, timestamp, metadata } = await request.json() as {
     id: string;
     messages: Message[];
@@ -41,6 +46,7 @@ export async function POST(request: Request) {
           description,
           timestamp: timestamp ? new Date(timestamp) : new Date(),
           metadata,
+          userId: session?.user?.id || 'guest',
         })
         .onConflictDoUpdate({
           target: chats.id,

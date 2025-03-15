@@ -46,9 +46,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       return token
     },
     async session({ session, token }) {
-      if (token?.accessToken) session.accessToken = token.accessToken
-
-      return session
+      session.user = {
+        ...session.user,
+        // @ts-expect-error
+        id: token.sub,
+        // @ts-expect-error
+        username: token?.user?.username || token?.user?.gh_username,
+      };
+      return session;
     },
   },
   experimental: { enableWebAuthn: true },

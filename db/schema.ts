@@ -3,6 +3,10 @@ import type { AdapterAccountType } from "next-auth/adapters"
 
 export const chats = pgTable('chats', {
   id: uuid('id').primaryKey().defaultRandom(),
+  userId: text("user_id").references(() => users.id, {
+    onDelete: "cascade",
+    onUpdate: "cascade",
+  }),
   messages: jsonb('messages').$type<any[]>(), // 存储消息数组
   urlId: text('url_id').notNull(),
   description: text('description'),
