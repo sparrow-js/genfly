@@ -3,7 +3,8 @@ import type { ReactNode } from "react";
 import { auth } from "auth"
 import { SessionProvider } from "next-auth/react"
 import { Header } from '@/components/header/Header';
-
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export const metadata: Metadata = {
   title: "Login | Platforms Starter Kit",
@@ -23,6 +24,7 @@ export default async function AuthLayout({ children }: { children: ReactNode }) 
       <Header />
         {children}
       </div>
+      <ToastContainer />
     </SessionProvider>
    
   );

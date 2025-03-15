@@ -6,8 +6,7 @@ import { Header } from '@/components/header/Header';
 import { BaseChat } from '@/components/chat/BaseChat';
 import { Chat } from '@/components/chat/Chat.client';
 import { Suspense } from 'react';
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+
 
 // Client-side only components
 // const Chat = dynamic(() => import('@/components/chat/Chat.client').then(mod => mod.Chat), {
@@ -26,7 +25,6 @@ export default function Home() {
       <Suspense fallback={<BaseChat />}>
         <Chat />
       </Suspense>
-      <ToastContainer />
     </div>
   );
 }
