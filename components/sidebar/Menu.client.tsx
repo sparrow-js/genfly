@@ -14,7 +14,8 @@ import { useSearchFilter } from '@/lib/hooks/useSearchFilter';
 import { classNames } from '@/utils/classNames';
 import { useStore } from '@nanostores/react';
 import { profileStore } from '@/lib/stores/profile';
-import { useSession } from "next-auth/react"
+import { useSession, signOut } from "next-auth/react"
+import { Button } from '../ui/Button';
 
 
 const menuVariants = {
@@ -330,10 +331,28 @@ export const Menu = () => {
               </Dialog>
             </DialogRoot>
           </div>
-          <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-800 px-4 py-3">
-            <SettingsButton onClick={handleSettingsClick} />
-            <ThemeSwitch />
+          <div className="flex flex-col">
+            {
+              session?.user && (
+                <div className="bg-bolt-elements-background-depth-1 border-t border-bolt-elements-borderColor overflow-hidden p-2">
+                <Button 
+                  className="flex flex-row justify-start! gap-2 p-2 rounded-lg w-full text-gray-700 dark:text-white hover:text-gray-900 dark:hover:text-white hover:bg-gray-50/80 dark:hover:bg-gray-600/80" 
+                  variant="ghost"
+                  onClick={() => signOut()}
+                >
+                  <span className="i-ph:sign-out text-lg" />
+                  Sign Out
+                </Button>
+              </div>
+              )
+            }
+           
+            <div className="flex items-center justify-between border-t border-gray-200 dark:border-gray-800 px-4 py-3">
+              <SettingsButton onClick={handleSettingsClick} />
+              <ThemeSwitch />
+            </div>
           </div>
+          
         </div>
       </motion.div>
 

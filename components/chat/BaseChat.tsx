@@ -37,6 +37,7 @@ import ProgressCompilation from './ProgressCompilation';
 import type { ProgressAnnotation } from '@/types/context';
 import { LOCAL_PROVIDERS } from '@/lib/stores/settings';
 import { ClientOnly } from '@/components/ClientOnly';
+import { SidebarLeft } from '@/components/sidebar/left';
 
 const TEXTAREA_MIN_HEIGHT = 76;
 
@@ -306,6 +307,8 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
         data-chat-visible={showChat}
       >
         <Menu />
+        <SidebarLeft />
+   
         <div className="flex flex-col lg:flex-row overflow-y-auto w-full h-full">
           <div className={classNames(styles.Chat, 'flex flex-col flex-grow lg:min-w-[var(--chat-min-width)] h-full')}>
             {!chatStarted && (
@@ -325,7 +328,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
               ref={scrollRef}
             >
               {chatStarted ? (
-                <div className="flex-1 w-full max-w-chat pb-6 mx-auto z-1">
+                <div className="flex-1 w-full max-w-chat pb-6 mx-auto z-1 px-6">
                   <Messages
                     ref={messageRef}
                     className="flex flex-col "
@@ -335,7 +338,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                 </div>
               ) : null}
               <div
-                className={classNames('flex flex-col gap-4 w-full max-w-chat mx-auto z-prompt', {
+                className={classNames('flex flex-col gap-4 w-full max-w-chat mx-auto z-prompt px-6', {
                   'sticky bottom-2': chatStarted,
                   'position-absolute': chatStarted,
                 })}
