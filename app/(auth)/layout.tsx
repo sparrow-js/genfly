@@ -7,7 +7,7 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 export const metadata: Metadata = {
-  title: "Login | Platforms Starter Kit",
+  title: "Genfly | Fast-track your idea to reality",
 };
 
 export default async function AuthLayout({ children }: { children: ReactNode }) {
