@@ -19,7 +19,6 @@ export interface ChatHistoryItem {
   metadata?: IChatMetadata;
 }
 
-const persistenceEnabled = true;
 
 export const chatId = atom<string | undefined>(undefined);
 export const appId = atom<string | undefined>(undefined);
@@ -55,10 +54,6 @@ export function useChatHistory() {
   const [urlId, setUrlId] = useState<string | undefined>();
 
   useEffect(() => {
-    if (!persistenceEnabled) {
-      setReady(true);
-      return;
-    }
 
     if (mixedId) {
       fetch(`/api/chats/${mixedId}`)

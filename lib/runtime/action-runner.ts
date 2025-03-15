@@ -114,7 +114,6 @@ export class ActionRunner {
   async runAction(data: ActionCallbackData, isStreaming: boolean = false) {
     const { actionId } = data;
     const action = this.actions.get()[actionId];
-
     if (!action) {
       unreachable(`Action ${actionId} not found`);
     }

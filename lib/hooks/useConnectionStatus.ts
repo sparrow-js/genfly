@@ -36,14 +36,14 @@ export const useConnectionStatus = () => {
     }
   };
 
-  useEffect(() => {
-    // Check immediately and then every 10 seconds
-    checkStatus();
+  // useEffect(() => {
+  //   // Check immediately and then every 10 seconds
+  //   checkStatus();
 
-    const interval = setInterval(checkStatus, 10 * 1000);
+  //   const interval = setInterval(checkStatus, 10 * 1000);
 
-    return () => clearInterval(interval);
-  }, [acknowledgedIssue]);
+  //   return () => clearInterval(interval);
+  // }, [acknowledgedIssue]);
 
   const acknowledgeIssue = () => {
     setAcknowledgedIssue(currentIssue);
