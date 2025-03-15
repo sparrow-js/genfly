@@ -42,10 +42,6 @@ function getProviderInfo(llmManager: LLMManager) {
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const provider = searchParams.get('provider') || undefined;
-  const session = await auth();
-  if (!session?.user) {
-    return new NextResponse("Unauthorized", { status: 401 });
-  }
 
   // For Cloudflare env in Next.js, you might need to adjust this based on your setup
   const env = process.env as Record<string, string>;
