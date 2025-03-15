@@ -4,6 +4,7 @@ import { chatStore } from '@/lib/stores/chat';
 import { classNames } from '@/utils/classNames';
 import { HeaderActionButtons } from './HeaderActionButtons.client';
 import { ChatDescription } from '@/lib/persistence/ChatDescription.client';
+import Link from 'next/link';
 
 export function Header() {
   const chat = useStore(chatStore);
@@ -17,12 +18,12 @@ export function Header() {
     >
       <div className="flex items-center gap-2 z-logo text-bolt-elements-textPrimary cursor-pointer">
         <div className="i-ph:sidebar-simple-duotone text-xl" />
-        <a href="/" className="text-2xl font-semibold text-accent flex items-center">
+        <Link href="/" className="text-2xl font-semibold text-accent flex items-center">
           {/* <span className="i-bolt:logo-text?mask w-[46px] inline-block" /> */}
           <span className="inline-block mr-1">genfly</span>
           <img src="/logo-04.png" alt="logo" className="w-[24px] inline-block dark:hidden" />
           <img src="/logo-04.png" alt="logo" className="w-[24px] inline-block hidden dark:block" />
-        </a>
+        </Link>
       </div>
       {chat.started && ( // Display ChatDescription and HeaderActionButtons only when the chat has started.
         <>

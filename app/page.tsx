@@ -1,6 +1,3 @@
-
-
-
 import { Header } from '@/components/header/Header';
 import { BaseChat } from '@/components/chat/BaseChat';
 import { Suspense } from 'react';
