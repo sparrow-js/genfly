@@ -38,6 +38,8 @@ import type { ProgressAnnotation } from '@/types/context';
 import { LOCAL_PROVIDERS } from '@/lib/stores/settings';
 import { ClientOnly } from '@/components/ClientOnly';
 import { SidebarLeft } from '@/components/sidebar/left';
+import { useSession } from "next-auth/react"
+
 
 const TEXTAREA_MIN_HEIGHT = 76;
 
@@ -117,6 +119,8 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     const [transcript, setTranscript] = useState('');
     const [isModelLoading, setIsModelLoading] = useState<string | undefined>('all');
     const [progressAnnotations, setProgressAnnotations] = useState<ProgressAnnotation[]>([]);
+    const { data: session } = useSession();
+
     useEffect(() => {
       if (data) {
         const progressList = data.filter(
@@ -306,9 +310,12 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
         className={classNames(styles.BaseChat, 'relative flex h-full w-full overflow-hidden')}
         data-chat-visible={showChat}
       >
-        <Menu />
-        <SidebarLeft />
-   
+        {session?.user && (
+          <>
+            <Menu />
+            <SidebarLeft />
+          </>
+        )}
         <div className="flex flex-col lg:flex-row overflow-y-auto w-full h-full">
           <div className={classNames(styles.Chat, 'flex flex-col flex-grow lg:min-w-[var(--chat-min-width)] h-full')}>
             {!chatStarted && (
