@@ -23,13 +23,6 @@ import 'react-toastify/dist/ReactToastify.css';
 export default function Home() {
   return (
     <div className="flex flex-col h-full w-full">
-      <iframe
-        id="background-iframe"
-        className="absolute inset-0 w-full h-full pointer-events-none dark:bg-black light:bg-white"
-        src="/background"
-        title="background"
-      />
-      <Header />
       <Suspense fallback={<BaseChat />}>
         <Chat />
       </Suspense>
