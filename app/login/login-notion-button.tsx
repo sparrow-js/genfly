@@ -1,8 +1,12 @@
 import { Button } from "@/components/ui/Button";
 import { signIn } from "auth";
-import { RiNotionFill } from "react-icons/ri";
+import { SiNotion } from "react-icons/si";
 
-export default function LoginNotionButton() {
+interface LoginButtonProps {
+  className?: string;
+}
+
+export default function LoginNotionButton({ className }: LoginButtonProps) {
   return (
     <form
       action={async () => {
@@ -10,8 +14,8 @@ export default function LoginNotionButton() {
         await signIn("notion");
       }}
     >
-      <Button className="w-full">
-        <RiNotionFill className="mr-2" />
+      <Button className={className || "w-full"}>
+        <SiNotion className="mr-2 text-[20px]" />
         <p className="text-sm font-medium">Login with Notion</p>
       </Button>
     </form>

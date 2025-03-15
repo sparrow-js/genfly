@@ -2,19 +2,21 @@ import { Button } from "@/components/ui/Button";
 import { signIn } from "auth";
 import { FaGithub } from "react-icons/fa";
 
-export default function LoginGithubButton() {
+interface LoginButtonProps {
+  className?: string;
+}
+
+export default function LoginGithubButton({ className }: LoginButtonProps) {
   return (
     <form
       action={async () => {
         "use server";
-        await signIn("github", {
-          callbackUrl: "http://app.localhost:3000/",
-        });
+        await signIn("github");
       }}
     >
-      <Button className="w-full">
+      <Button className={className || "w-full"}>
         <FaGithub className="mr-2 text-[20px]" />
-        <p className="text-sm font-medium">Login with Github</p>
+        <p className="text-sm font-medium">Login with GitHub</p>
       </Button>
     </form>
   );

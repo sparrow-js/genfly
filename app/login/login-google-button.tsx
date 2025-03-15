@@ -2,7 +2,11 @@ import { Button } from "@/components/ui/Button";
 import { signIn } from "auth";
 import { FcGoogle } from "react-icons/fc";
 
-export default function LoginGoogleButton() {
+interface LoginButtonProps {
+  className?: string;
+}
+
+export default function LoginGoogleButton({ className }: LoginButtonProps) {
   return (
     <form
       action={async () => {
@@ -10,7 +14,7 @@ export default function LoginGoogleButton() {
         await signIn("google");
       }}
     >
-      <Button className="w-full">
+      <Button className={className || "w-full"}>
         <FcGoogle className="mr-2 text-[20px]" />
         <p className="text-sm font-medium">Login with Google</p>
       </Button>
