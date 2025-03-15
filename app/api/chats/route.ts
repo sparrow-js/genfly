@@ -2,13 +2,26 @@
 import { NextResponse } from 'next/server';
 import { withDb } from '@/db';
 import { chats } from '@/db/schema';
-import { eq } from 'drizzle-orm';
 import type { Message } from 'ai';
 import type { IChatMetadata } from '@/lib/persistence/types';
 import { auth } from 'auth';
-
+import { desc, eq } from 'drizzle-orm';
 export async function GET(request: Request) {
+
+    const session = await auth();
+    if (!session?.user) {
+        return new NextResponse("Unauthorized", { status: 401 });
+    }
+
     try {
+        // 获取当前用户信息
+        const userId = session.user.id;
+        
+        // 确保userId不为undefined
+        if (!userId) {
+            return new NextResponse("User ID not found", { status: 400 });
+        }
+        
         // 选择除messages以外的所有字段
         const allChats = await withDb(db => db.select({
             id: chats.id,
@@ -17,7 +30,9 @@ export async function GET(request: Request) {
             description: chats.description,
             timestamp: chats.timestamp,
             metadata: chats.metadata
-        }).from(chats));
+        }).from(chats)
+          .where(eq(chats.userId, userId))
+          .orderBy(desc(chats.timestamp)));
         
         return NextResponse.json(allChats);
     } catch (error) {
