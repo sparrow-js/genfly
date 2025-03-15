@@ -69,13 +69,6 @@ export function HistoryItem({ item, onDelete, onDuplicate, exportChat }: History
                   exportChat(item.id);
                 }}
               />
-              {onDuplicate && (
-                <ChatActionButton
-                  toolTipContent="Duplicate"
-                  icon="i-ph:copy h-4 w-4"
-                  onClick={() => onDuplicate?.(item.id)}
-                />
-              )}
               <ChatActionButton
                 toolTipContent="Rename"
                 icon="i-ph:pencil-fill h-4 w-4"

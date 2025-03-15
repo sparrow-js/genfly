@@ -6,9 +6,19 @@ import { eq } from 'drizzle-orm';
 import type { Message } from 'ai';
 import type { IChatMetadata } from '@/lib/persistence/types';
 import { auth } from 'auth';
+
 export async function GET(request: Request) {
     try {
-        const allChats = await withDb(db => db.select().from(chats));
+        // 选择除messages以外的所有字段
+        const allChats = await withDb(db => db.select({
+            id: chats.id,
+            userId: chats.userId,
+            urlId: chats.urlId,
+            description: chats.description,
+            timestamp: chats.timestamp,
+            metadata: chats.metadata
+        }).from(chats));
+        
         return NextResponse.json(allChats);
     } catch (error) {
         console.error('Failed to fetch chats:', error);
