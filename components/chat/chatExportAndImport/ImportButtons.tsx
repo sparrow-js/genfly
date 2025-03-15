@@ -59,7 +59,7 @@ export function ImportButtons(importChat: ((description: string, messages: Messa
       />
       <div className="flex flex-col items-center gap-4 max-w-2xl text-center">
         <div className="flex gap-2">
-          <Button
+          {/* <Button
             onClick={() => {
               const input = document.getElementById('chat-import');
               input?.click();
@@ -88,7 +88,7 @@ export function ImportButtons(importChat: ((description: string, messages: Messa
               'h-10 px-4 py-2 min-w-[120px] justify-center',
               'transition-all duration-200 ease-in-out rounded-lg',
             )}
-          />
+          /> */}
         </div>
       </div>
     </div>
