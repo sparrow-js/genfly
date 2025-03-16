@@ -54,6 +54,8 @@ export class WorkbenchStore {
 
   deploymentStatus: WritableAtom<'pending' | 'completed' | null> = atom(null);
 
+  isFirstDeploy: WritableAtom<boolean> = atom(false);
+
   hasSendLLM: WritableAtom<boolean> = atom(false);
 
   showWorkbench: WritableAtom<boolean> = atom(false);
@@ -568,6 +570,7 @@ export class WorkbenchStore {
   async uploadFilesTomachine(files: { path: string, content: string }[]) {
 
     try {
+        this.currentView.set('preview');
         const response = await fetch('/api/updatefilelist', {
           method: 'POST',
           body: JSON.stringify({
@@ -575,6 +578,7 @@ export class WorkbenchStore {
             files: files,
           }),
         });
+        
 
         if (!response.ok) {
           this.tmpFiles.set(files);
@@ -594,7 +598,9 @@ export class WorkbenchStore {
           isLoading: true,
           loadingProgress: 0
         }]);
-        this.currentView.set('preview');
+        
+        this.setIsFirstDeploy(false);
+       
         // this.reloadPreview();
 
     } catch (error) {
@@ -604,6 +610,10 @@ export class WorkbenchStore {
 
   setDeploymentStatus(status: 'pending' | 'completed' | null) {
     this.deploymentStatus.set(status);
+  }
+
+  setIsFirstDeploy(isFirstDeploy: boolean) {
+    this.isFirstDeploy.set(isFirstDeploy);
   }
 
   reloadPreview() {

@@ -6,6 +6,7 @@ import { PortDropdown } from './PortDropdown';
 import { ScreenshotSelector } from './ScreenshotSelector';
 import { appId } from '@/lib/persistence/useChatHistory';
 import { Progress } from "@/components/ui/Progress-ui";
+import { motion } from 'framer-motion';
 
 type ResizeSide = 'left' | 'right' | null;
 
@@ -461,8 +462,121 @@ export const Preview = memo(({ sendMessage }: PreviewProps) => {
             </div>
           )}
          
+          {workbenchStore.isFirstDeploy.get() && (
+            <div className="w-full h-full flex flex-col items-center justify-center bg-background px-4">
+              <div className="max-w-md w-full flex flex-col items-center">
+                <div className="mb-10 relative flex items-center justify-center">
+                  {/* 外层光晕 - 使用更多关键帧实现更平滑的动画 */}
+                  <motion.div
+                    className="absolute w-12 h-12 rounded-full"
+                    animate={{ 
+                      boxShadow: [
+                        "0 0 0 rgba(255, 255, 255, 0)",
+                        "0 0 10px rgba(255, 255, 255, 0.2)",
+                        "0 0 20px rgba(255, 255, 255, 0.4)",
+                        "0 0 10px rgba(255, 255, 255, 0.2)",
+                        "0 0 0 rgba(255, 255, 255, 0)"
+                      ],
+                      scale: [0.97, 1.0, 1.03, 1.0, 0.97]
+                    }}
+                    transition={{
+                      duration: 5,
+                      times: [0, 0.25, 0.5, 0.75, 1], // 更精细的关键帧控制
+                      ease: "easeInOut",
+                      repeat: Infinity,
+                      repeatType: "loop"
+                    }}
+                  />
+                  
+                  {/* 内层光晕 - 使用更多关键帧实现更平滑的动画 */}
+                  <motion.div
+                    className="absolute w-10 h-10 rounded-full"
+                    animate={{ 
+                      boxShadow: [
+                        "0 0 0 rgba(255, 255, 255, 0)",
+                        "0 0 8px rgba(255, 255, 255, 0.3)",
+                        "0 0 15px rgba(255, 255, 255, 0.5)",
+                        "0 0 8px rgba(255, 255, 255, 0.3)",
+                        "0 0 0 rgba(255, 255, 255, 0)"
+                      ],
+                      scale: [0.99, 1.02, 1.05, 1.02, 0.99]
+                    }}
+                    transition={{
+                      duration: 4,
+                      times: [0, 0.25, 0.5, 0.75, 1], // 更精细的关键帧控制
+                      ease: [0.25, 0.1, 0.25, 1], // 使用贝塞尔曲线实现更平滑的过渡
+                      repeat: Infinity,
+                      repeatType: "loop"
+                    }}
+                  />
+                  
+                  {/* 图标 - 使用更平滑的亮度变化和缩放 */}
+                  <motion.img 
+                    src="/logo-04.png" 
+                    alt="Genfly Logo" 
+                    className="w-8 h-8 relative z-10"
+                    animate={{ 
+                      filter: [
+                        "brightness(1)",
+                        "brightness(1.2)",
+                        "brightness(1.4)",
+                        "brightness(1.2)",
+                        "brightness(1)"
+                      ],
+                      scale: [0.99, 1.01, 1.03, 1.01, 0.99]
+                    }}
+                    transition={{
+                      duration: 4,
+                      times: [0, 0.25, 0.5, 0.75, 1], // 更精细的关键帧控制
+                      ease: [0.25, 0.1, 0.25, 1], // 使用贝塞尔曲线实现更平滑的过渡
+                      repeat: Infinity,
+                      repeatType: "loop"
+                    }}
+                  />
+                </div>
+                
+                <div className="mb-16">
+                  <h2 className="text-gray-300 font-light tracking-wide text-lg flex items-center">
+                    Spinning up preview
+                    <span className="inline-flex ml-1">
+                      <motion.span 
+                        className="mx-0.5"
+                        animate={{ y: [0, -5, 0] }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          repeatType: "loop",
+                          delay: 0
+                        }}
+                      >.</motion.span>
+                      <motion.span 
+                        className="mx-0.5"
+                        animate={{ y: [0, -5, 0] }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          repeatType: "loop",
+                          delay: 0.2
+                        }}
+                      >.</motion.span>
+                      <motion.span 
+                        className="mx-0.5"
+                        animate={{ y: [0, -5, 0] }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          repeatType: "loop",
+                          delay: 0.4
+                        }}
+                      >.</motion.span>
+                    </span>
+                  </h2>
+                </div>
+              </div>
+            </div>
+          )}
 
-          {activePreview ? (
+          {activePreview && !workbenchStore.isFirstDeploy.get() && (
             <>
               <iframe
                 ref={iframeRef}
@@ -479,10 +593,6 @@ export const Preview = memo(({ sendMessage }: PreviewProps) => {
                 containerRef={iframeRef as unknown as React.RefObject<HTMLElement>}
               />
             </>
-          ) : (
-            <div className="flex w-full h-full justify-center items-center bg-bolt-elements-background-depth-1 text-bolt-elements-textPrimary">
-              No preview available
-            </div>
           )}
 
           {isDeviceModeOn && (

@@ -48,12 +48,15 @@ export function useEditChatDescription({
   }, [customChatId, chatIdFromStore]);
 
   useEffect(() => {
+    console.log('initialDescription **********', initialDescription);
     setCurrentDescription(initialDescription);
   }, [initialDescription]);
 
   const toggleEditMode = useCallback(() => setEditing((prev) => !prev), []);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('handleChange **********', e.target.value);
+
     setCurrentDescription(e.target.value);
   }, []);
 
@@ -75,16 +78,17 @@ export function useEditChatDescription({
   }, [chatId, initialDescription]);
 
   const handleBlur = useCallback(async () => {
-    const latestDescription = await fetchLatestDescription();
-    setCurrentDescription(latestDescription);
-    toggleEditMode();
+    // const latestDescription = await fetchLatestDescription();
+    // console.log('handleBlur **********', latestDescription);
+    // setCurrentDescription(latestDescription);
+    // toggleEditMode();
   }, [fetchLatestDescription, toggleEditMode]);
 
   const isValidDescription = useCallback((desc: string): boolean => {
     const trimmedDesc = desc.trim();
 
     if (trimmedDesc === initialDescription) {
-      toggleEditMode();
+      // toggleEditMode();
       return false;
     }
 
@@ -130,12 +134,15 @@ export function useEditChatDescription({
           throw new Error('Failed to update description');
         }
 
+        console.log('handleSubmit **********', currentDescription);
+        setCurrentDescription(currentDescription);
+
         if (syncWithGlobalStore) {
           descriptionStore.set(currentDescription);
         }
 
         toast.success('Chat description updated successfully');
-        toggleEditMode();
+        setEditing(false);
       } catch (error) {
         toast.error('Failed to update chat description: ' + (error as Error).message);
       }

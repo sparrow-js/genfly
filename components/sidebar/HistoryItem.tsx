@@ -46,7 +46,7 @@ export function HistoryItem({ item, onDelete, onDuplicate, exportChat }: History
           <button
             type="submit"
             className="i-ph:check h-4 w-4 text-gray-500 hover:text-purple-500 transition-colors"
-            onMouseDown={handleSubmit}
+            // onMouseDown={handleSubmit}
           />
         </form>
       ) : (

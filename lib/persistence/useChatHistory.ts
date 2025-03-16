@@ -149,6 +149,7 @@ export function useChatHistory() {
           });
           
           workbenchStore.setDeploymentStatus('completed');
+          workbenchStore.setIsFirstDeploy(true);
 
           if (!urlId) {
             navigateChat(newId);
