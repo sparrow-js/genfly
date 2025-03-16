@@ -1,11 +1,15 @@
 // app/api/chats/[id]/route.ts
 import { NextResponse } from 'next/server';
-import { withDb, getDb } from '@/db';
+import { db } from '@/db/test';
 import { chats } from '@/db/schema';
 import type { Message } from 'ai';
 import type { IChatMetadata } from '@/lib/persistence/types';
 import { auth } from 'auth';
 import { desc, eq } from 'drizzle-orm';
+
+
+export const runtime = 'edge';
+
 export async function GET(request: Request) {
 
     const session = await auth();
@@ -23,8 +27,8 @@ export async function GET(request: Request) {
         }
         
         // 选择除messages以外的所有字段
-        const db = getDb();
-
+        // const db = getDb();
+       try {
         const allChats = await db.select({
           id: chats.id,
           userId: chats.userId,
@@ -39,6 +43,12 @@ export async function GET(request: Request) {
         // const allChats = await withDb(db => );
         
         return NextResponse.json(allChats);
+       } catch (error) {
+        console.error('Failed to fetch chats:', error);
+        return NextResponse.json({ error: 'Failed to fetch chats' }, { status: 500 });
+       }
+
+      
     } catch (error) {
         console.error('Failed to fetch chats:', error);
         return NextResponse.json({ error: 'Failed to fetch chats' }, { status: 500 });
@@ -66,7 +76,7 @@ export async function POST(request: Request) {
 
   try {
 
-    const db = getDb();
+    // const db = getDb();
 
     const result = await db
     .insert(chats)

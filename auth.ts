@@ -5,13 +5,13 @@ import GitHub from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
 import { DrizzleAdapter } from "@auth/drizzle-adapter"
 import Notion from "next-auth/providers/notion"
-import { getDb } from "@/db"
+import { db } from "./db/test"
 
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
   debug: !!process.env.AUTH_DEBUG,
   theme: { logo: "https://authjs.dev/img/logo-sm.png" },
-  adapter: DrizzleAdapter(getDb()),
+  adapter: DrizzleAdapter(db),
   providers: [
     GitHub({
       clientId: process.env.GITHUB_ID,
