@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 import { withDb } from '@/db';
 import { chats } from '@/db/schema';
 import { eq } from 'drizzle-orm';
-
+import { auth } from 'auth';
 const isUUID = (str: string) => {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
   return uuidRegex.test(str);
@@ -15,6 +15,13 @@ export async function GET(
 ) {
   const { id } = await params; // 从 params 中获取 id
 
+  const session = await auth();
+  if (!session) {
+    return new Response('Unauthorized', {
+      status: 401,
+      headers: { 'Content-Type': 'text/plain' },
+    });
+  }
 
   if (!id) {
     return NextResponse.json({ error: 'Chat ID is required' }, { status: 400 });

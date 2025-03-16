@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { streamText } from '@/lib/.server/llm/stream-text';
 import { stripIndents } from '@/utils/stripIndent'; // Adjusted import path
 import type { ProviderInfo } from '@/types/model'; // Adjusted import path
+import { auth } from 'auth';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,6 +14,13 @@ export async function POST(request: NextRequest) {
       apiKeys?: Record<string, string>;
     };
 
+    const session = await auth();
+    if (!session) {
+      return new Response('Unauthorized', {
+        status: 401,
+        headers: { 'Content-Type': 'text/plain' },
+      });
+    }
     const { name: providerName } = provider;
 
     // Validate 'model' and 'provider' fields

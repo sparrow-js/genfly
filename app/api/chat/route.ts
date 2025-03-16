@@ -12,6 +12,7 @@ import type { ContextAnnotation, ProgressAnnotation } from '@/types/context';
 import { WORK_DIR } from '@/utils/constants';
 import { createSummary } from '@/lib/.server/llm/create-summary';
 import { extractPropertiesFromMessage } from '@/lib/.server/llm/utils';
+import { auth } from 'auth';
 
 const logger = createScopedLogger('api.chat');
 
@@ -43,6 +44,14 @@ export async function POST(request: Request) {
     promptId?: string;
     contextOptimization: boolean;
   };
+
+  const session = await auth();
+  if (!session) {
+    return new Response('Unauthorized', {
+      status: 401,
+      headers: { 'Content-Type': 'text/plain' },
+    });
+  }
 
   const cookieHeader = request.headers.get('Cookie');
   const apiKeys = JSON.parse(parseCookies(cookieHeader)?.apiKeys || '{}');

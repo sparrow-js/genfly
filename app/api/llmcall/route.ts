@@ -9,6 +9,8 @@ import { LLMManager } from '@/lib/modules/llm/manager';
 import type { ModelInfo } from '@/lib/modules/llm/types';
 import { getApiKeysFromCookie, getProviderSettingsFromCookie } from '@/lib/api/cookies';
 import { createScopedLogger } from '@/utils/logger';
+import { auth } from "auth"
+
 
 const logger = createScopedLogger('api.llmcall');
 
@@ -29,6 +31,14 @@ export async function POST(request: Request) {
     provider: ProviderInfo;
     streamOutput?: boolean;
   };
+
+  const session = await auth();
+  if (!session) {
+    return new Response('Unauthorized', {
+      status: 401,
+      headers: { 'Content-Type': 'text/plain' },
+    });
+  }
 
   const { name: providerName } = provider;
 

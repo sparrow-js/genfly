@@ -43,6 +43,14 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const provider = searchParams.get('provider') || undefined;
 
+  const session = await auth();
+  if (!session) {
+    return new Response('Unauthorized', {
+      status: 401,
+      headers: { 'Content-Type': 'text/plain' },
+    });
+  }
+
   // For Cloudflare env in Next.js, you might need to adjust this based on your setup
   const env = process.env as Record<string, string>;
   const llmManager = LLMManager.getInstance(env);

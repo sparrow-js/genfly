@@ -3,11 +3,21 @@ import { withDb } from '@/db';
 import { chats } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import type { ChatHistoryItem } from "@/lib/persistence/types";
+import { auth } from "auth";
 
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> } // 类型定义
 ) {
+
+  const session = await auth();
+  if (!session) {
+    return new Response('Unauthorized', {
+      status: 401,
+      headers: { 'Content-Type': 'text/plain' },
+    });
+  }
+
   try {
     const body = await request.json();
     const { description } = body;

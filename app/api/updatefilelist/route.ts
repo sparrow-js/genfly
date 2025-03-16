@@ -1,6 +1,7 @@
 // app/api/update-files/route.ts
 import { NextResponse } from 'next/server';
 import { updateFileList } from '@/utils/machines';
+import { auth } from 'auth';
 
 export const runtime = 'edge';
 export async function POST(request: Request) {
@@ -9,6 +10,14 @@ export async function POST(request: Request) {
     const body: { appName: string; files: { path: string; content: string }[] } = await request.json();
     const { appName, files } = body;
 
+    const session = await auth();
+    if (!session) {
+      return new Response('Unauthorized', {
+        status: 401,
+        headers: { 'Content-Type': 'text/plain' },
+      });
+    }
+    
     await updateFileList(appName, files);
 
     return NextResponse.json({
