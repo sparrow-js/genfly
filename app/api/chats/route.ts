@@ -1,6 +1,6 @@
 // app/api/chats/[id]/route.ts
 import { NextResponse } from 'next/server';
-import { withDb } from '@/db';
+import { withDb, getDb } from '@/db';
 import { chats } from '@/db/schema';
 import type { Message } from 'ai';
 import type { IChatMetadata } from '@/lib/persistence/types';
@@ -23,16 +23,20 @@ export async function GET(request: Request) {
         }
         
         // 选择除messages以外的所有字段
-        const allChats = await withDb(db => db.select({
-            id: chats.id,
-            userId: chats.userId,
-            urlId: chats.urlId,
-            description: chats.description,
-            timestamp: chats.timestamp,
-            metadata: chats.metadata
-        }).from(chats)
-          .where(eq(chats.userId, userId))
-          .orderBy(desc(chats.timestamp)));
+        const db = getDb();
+
+        const allChats = await db.select({
+          id: chats.id,
+          userId: chats.userId,
+          urlId: chats.urlId,
+          description: chats.description,
+          timestamp: chats.timestamp,
+          metadata: chats.metadata
+      }).from(chats)
+        .where(eq(chats.userId, userId))
+        .orderBy(desc(chats.timestamp))
+        
+        // const allChats = await withDb(db => );
         
         return NextResponse.json(allChats);
     } catch (error) {
@@ -61,29 +65,54 @@ export async function POST(request: Request) {
   }
 
   try {
-    const result = await withDb(async (db) => {
-      return db
-        .insert(chats)
-        .values({
-          id,
-          messages,
-          urlId: urlId || id,
-          description,
-          timestamp: timestamp ? new Date(timestamp) : new Date(),
-          metadata,
-          userId: session?.user?.id || 'guest',
-        })
-        .onConflictDoUpdate({
-          target: chats.id,
-          set: {
-            messages,
-            description,
-            metadata,
-            timestamp: timestamp ? new Date(timestamp) : new Date(),
-          },
-        })
-        .returning();
-    });
+
+    const db = getDb();
+
+    const result = await db
+    .insert(chats)
+    .values({
+      id,
+      messages,
+      urlId: urlId || id,
+      description,
+      timestamp: timestamp ? new Date(timestamp) : new Date(),
+      metadata,
+      userId: session?.user?.id || 'guest',
+    })
+    .onConflictDoUpdate({
+      target: chats.id,
+      set: {
+        messages,
+        description,
+        metadata,
+        timestamp: timestamp ? new Date(timestamp) : new Date(),
+      },
+    })
+    .returning();
+
+    // const result = await withDb(async (db) => {
+    //   return db
+    //     .insert(chats)
+    //     .values({
+    //       id,
+    //       messages,
+    //       urlId: urlId || id,
+    //       description,
+    //       timestamp: timestamp ? new Date(timestamp) : new Date(),
+    //       metadata,
+    //       userId: session?.user?.id || 'guest',
+    //     })
+    //     .onConflictDoUpdate({
+    //       target: chats.id,
+    //       set: {
+    //         messages,
+    //         description,
+    //         metadata,
+    //         timestamp: timestamp ? new Date(timestamp) : new Date(),
+    //       },
+    //     })
+    //     .returning();
+    // });
 
     return NextResponse.json(result[0]);
   } catch (error) {
