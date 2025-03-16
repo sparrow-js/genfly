@@ -12,7 +12,7 @@
 export function createSampler<T extends (...args: any[]) => any>(fn: T, sampleInterval: number): T {
   let lastArgs: Parameters<T> | null = null;
   let lastTime = 0;
-  let timeout: number | null = null;
+  let timeout: number | NodeJS.Timeout | null = null;
   let isScheduled = false;
 
   // 使用 requestAnimationFrame 进行更高效的调度
@@ -41,8 +41,8 @@ export function createSampler<T extends (...args: any[]) => any>(fn: T, sampleIn
   };
 
   // 取消调度
-  const cancelSchedule = (id: number) => {
-    if (typeof window !== 'undefined' && 'cancelAnimationFrame' in window) {
+  const cancelSchedule = (id: number | NodeJS.Timeout) => {
+    if (typeof id === 'number' && typeof window !== 'undefined' && 'cancelAnimationFrame' in window) {
       window.cancelAnimationFrame(id);
     } else {
       clearTimeout(id);
