@@ -76,7 +76,6 @@ export function useEditChatDescription({
 
   const handleBlur = useCallback(async () => {
     // const latestDescription = await fetchLatestDescription();
-    // console.log('handleBlur **********', latestDescription);
     // setCurrentDescription(latestDescription);
     // toggleEditMode();
   }, [fetchLatestDescription, toggleEditMode]);
@@ -131,7 +130,6 @@ export function useEditChatDescription({
           throw new Error('Failed to update description');
         }
 
-        console.log('handleSubmit **********', currentDescription);
         setCurrentDescription(currentDescription);
 
         if (syncWithGlobalStore) {

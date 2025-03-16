@@ -46,7 +46,9 @@ export default class AnthropicProvider extends BaseProvider {
     apiKeys?: Record<string, string>;
     providerSettings?: Record<string, IProviderSetting>;
   }) => LanguageModelV1 = (options) => {
+
     const { apiKeys, providerSettings, serverEnv, model } = options;
+
     const { apiKey } = this.getProviderBaseUrlAndKey({
       apiKeys,
       providerSettings,
@@ -56,7 +58,7 @@ export default class AnthropicProvider extends BaseProvider {
     });
     const anthropic = createOpenAI({
       apiKey: process.env.OPEN_ROUTER_API_KEY,
-      baseURL: "https://openrouter.ai/api/v1"
+      baseURL: "https://openrouter.ai/api/v1",
     });
 
     // const anthropic = createAnthropic({
