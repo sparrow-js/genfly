@@ -35,20 +35,20 @@ export const TAB_LABELS: Record<TabType, string> = {
 };
 
 export const TAB_DESCRIPTIONS: Record<TabType, string> = {
-  // profile: 'Manage your profile and account settings',
-  // settings: 'Configure application preferences',
-  // notifications: 'View and manage your notifications',
-  // features: 'Explore new and upcoming features',
-  // data: 'Manage your data and storage',
-  // 'cloud-providers': 'Configure cloud AI providers and models',
-  // 'local-providers': 'Configure local AI providers and models',
-  // 'service-status': 'Monitor cloud LLM service status',
-  // connection: 'Check connection status and settings',
-  // debug: 'Debug tools and system information',
-  // 'event-logs': 'View system events and logs',
-  // update: 'Check for updates and release notes',
-  // 'task-manager': 'Monitor system resources and processes',
-  // 'tab-management': 'Configure visible tabs and their order',
+  profile: 'Manage your profile and account settings',
+  settings: 'Configure application preferences',
+  notifications: 'View and manage your notifications',
+  features: 'Explore new and upcoming features',
+  data: 'Manage your data and storage',
+  'cloud-providers': 'Configure cloud AI providers and models',
+  'local-providers': 'Configure local AI providers and models',
+  'service-status': 'Monitor cloud LLM service status',
+  connection: 'Check connection status and settings',
+  debug: 'Debug tools and system information',
+  'event-logs': 'View system events and logs',
+  update: 'Check for updates and release notes',
+  'task-manager': 'Monitor system resources and processes',
+  'tab-management': 'Configure visible tabs and their order',
 };
 
 export const DEFAULT_TAB_CONFIG = [
