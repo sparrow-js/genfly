@@ -13,9 +13,9 @@ export default class DeepseekProvider extends BaseProvider {
   };
 
   staticModels: ModelInfo[] = [
-    { name: 'deepseek-coder', label: 'Deepseek-Coder', provider: 'Deepseek', maxTokenAllowed: 8000 },
-    { name: 'deepseek-chat', label: 'Deepseek-Chat', provider: 'Deepseek', maxTokenAllowed: 8000 },
-    { name: 'deepseek-reasoner', label: 'Deepseek-Reasoner', provider: 'Deepseek', maxTokenAllowed: 8000 },
+    // { name: 'deepseek-coder', label: 'Deepseek-Coder', provider: 'Deepseek', maxTokenAllowed: 8000 },
+    { name: 'deepseek/deepseek-chat', label: 'Deepseek-Chat', provider: 'Deepseek', maxTokenAllowed: 8000 },
+    { name: 'deepseek/deepseek-r1', label: 'Deepseek-Reasoner', provider: 'Deepseek', maxTokenAllowed: 8000 },
   ];
 
   getModelInstance(options: {
@@ -43,7 +43,7 @@ export default class DeepseekProvider extends BaseProvider {
       baseURL: 'https://openrouter.ai/api/v1',
     });
 
-    return deepseek('deepseek/deepseek-chat', {
+    return deepseek(model, {
       // simulateStreaming: true,
     });
   }
