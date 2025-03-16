@@ -7,7 +7,7 @@ import { useStore } from '@nanostores/react';
 import type { Message } from 'ai';
 import { useChat } from 'ai/react';
 import { useAnimate } from 'framer-motion';
-import { memo, useCallback, useEffect, useRef, useState } from 'react';
+import { memo, useCallback, useEffect, useRef, useState, useMemo } from 'react';
 import { cssTransition, toast, ToastContainer } from 'react-toastify';
 import { useMessageParser, usePromptEnhancer, useShortcuts, useSnapScroll } from '@/lib/hooks';
 import { description, useChatHistory } from '@/lib/persistence';
@@ -97,7 +97,7 @@ const processSampledMessages = createSampler(
       storeMessageHistory(messages).catch((error) => toast.error(error.message));
     }
   },
-  50,
+  200,
 );
 
 interface ChatProps {
@@ -212,80 +212,9 @@ export const ChatImpl = memo(
       initialInput: Cookies.get(PROMPT_COOKIE_KEY) || '',
     });
     
-    useEffect(() => {
-      const prompt = searchParams.get('prompt');
-
-      // console.log(prompt, searchParams, model, provider);
-
-      if (prompt) {
-        // setSearchParams({});
-        runAnimation();
-        append({
-          role: 'user',
-          content: [
-            {
-              type: 'text',
-              text: `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${prompt}`,
-            },
-          ] as any, // Type assertion to bypass compiler check
-        });
-      }
-    }, [model, provider, searchParams]);
-
-    const { enhancingPrompt, promptEnhanced, enhancePrompt, resetEnhancer } = usePromptEnhancer();
-    const { parsedMessages, parseMessages } = useMessageParser();
-
     const TEXTAREA_MAX_HEIGHT = chatStarted ? 400 : 200;
 
-    useEffect(() => {
-      chatStore.setKey('started', initialMessages.length > 0);
-    }, []);
-
-    useEffect(() => {
-      processSampledMessages({
-        messages,
-        initialMessages,
-        isLoading,
-        parseMessages,
-        storeMessageHistory,
-      });
-    }, [messages, isLoading, parseMessages]);
-
-    const scrollTextArea = () => {
-      const textarea = textareaRef.current;
-
-      if (textarea) {
-        textarea.scrollTop = textarea.scrollHeight;
-      }
-    };
-
-    const abort = () => {
-      stop();
-      chatStore.setKey('aborted', true);
-      workbenchStore.abortAllActions();
-
-      logStore.logProvider('Chat response aborted', {
-        component: 'Chat',
-        action: 'abort',
-        model,
-        provider: provider.name,
-      });
-    };
-
-    useEffect(() => {
-      const textarea = textareaRef.current;
-
-      if (textarea) {
-        textarea.style.height = 'auto';
-
-        const scrollHeight = textarea.scrollHeight;
-
-        textarea.style.height = `${Math.min(scrollHeight, TEXTAREA_MAX_HEIGHT)}px`;
-        textarea.style.overflowY = scrollHeight > TEXTAREA_MAX_HEIGHT ? 'auto' : 'hidden';
-      }
-    }, [input, textareaRef]);
-
-    const runAnimation = async () => {
+    const runAnimation = useCallback(async () => {
       if (chatStarted) {
         return;
       }
@@ -298,9 +227,81 @@ export const ChatImpl = memo(
       chatStore.setKey('started', true);
 
       setChatStarted(true);
-    };
+    }, [chatStarted, animate]);
 
-    const sendMessage = async (_event: React.UIEvent, messageInput?: string) => {
+    useEffect(() => {
+      const prompt = searchParams.get('prompt');
+
+      if (prompt) {
+        runAnimation();
+        append({
+          role: 'user',
+          content: [
+            {
+              type: 'text',
+              text: `[Model: ${model}]\n\n[Provider: ${provider.name}]\n\n${prompt}`,
+            },
+          ] as any, // Type assertion to bypass compiler check
+        });
+      }
+    }, [model, provider, searchParams, append, runAnimation]);
+
+    const { enhancingPrompt, promptEnhanced, enhancePrompt, resetEnhancer } = usePromptEnhancer();
+    const { parsedMessages, parseMessages } = useMessageParser();
+
+    useEffect(() => {
+      chatStore.setKey('started', initialMessages.length > 0);
+    }, [initialMessages.length]);
+
+    const processMessages = useCallback(() => {
+      processSampledMessages({
+        messages,
+        initialMessages,
+        isLoading,
+        parseMessages,
+        storeMessageHistory,
+      });
+    }, [messages, initialMessages, isLoading, parseMessages, storeMessageHistory]);
+
+    useEffect(() => {
+      processMessages();
+    }, [processMessages]);
+
+    const scrollTextArea = useCallback(() => {
+      const textarea = textareaRef.current;
+
+      if (textarea) {
+        textarea.scrollTop = textarea.scrollHeight;
+      }
+    }, []);
+
+    const abort = useCallback(() => {
+      stop();
+      chatStore.setKey('aborted', true);
+      workbenchStore.abortAllActions();
+
+      logStore.logProvider('Chat response aborted', {
+        component: 'Chat',
+        action: 'abort',
+        model,
+        provider: provider.name,
+      });
+    }, [stop, model, provider.name]);
+
+    useEffect(() => {
+      const textarea = textareaRef.current;
+
+      if (textarea) {
+        textarea.style.height = 'auto';
+
+        const scrollHeight = textarea.scrollHeight;
+
+        textarea.style.height = `${Math.min(scrollHeight, TEXTAREA_MAX_HEIGHT)}px`;
+        textarea.style.overflowY = scrollHeight > TEXTAREA_MAX_HEIGHT ? 'auto' : 'hidden';
+      }
+    }, [input, TEXTAREA_MAX_HEIGHT]);
+
+    const sendMessage = useCallback(async (_event: React.UIEvent, messageInput?: string) => {
       const messageContent = messageInput || input;
       if (!messageContent?.trim()) {
         return;
@@ -437,15 +438,18 @@ export const ChatImpl = memo(
       resetEnhancer();
 
       textareaRef.current?.blur();
-    };
+    }, [
+      input, isLoading, abort, runAnimation, chatStarted, autoSelectTemplate, model, provider, 
+      imageDataList, error, messages, setMessages, reload, append, resetEnhancer
+    ]);
 
     /**
      * Handles the change event for the textarea and updates the input state.
      * @param event - The change event from the textarea.
      */
-    const onTextareaChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const onTextareaChange = useCallback((event: React.ChangeEvent<HTMLTextAreaElement>) => {
       handleInputChange(event);
-    };
+    }, [handleInputChange]);
 
     /**
      * Debounced function to cache the prompt in cookies.
@@ -469,16 +473,43 @@ export const ChatImpl = memo(
       }
     }, []);
 
-    const handleModelChange = (newModel: string) => {
+    const handleModelChange = useCallback((newModel: string) => {
       setModel(newModel);
       Cookies.set('selectedModel', newModel, { expires: 30 });
-    };
+    }, []);
 
-    const handleProviderChange = (newProvider: ProviderInfo) => {
+    const handleProviderChange = useCallback((newProvider: ProviderInfo) => {
       setProvider(newProvider);
       Cookies.set('selectedProvider', newProvider.name, { expires: 30 });
-    };
+    }, []);
 
+    const processedMessages = useMemo(() => {
+      return messages.map((message, i) => {
+        if (message.role === 'user') {
+          return message;
+        }
+
+        return {
+          ...message,
+          content: parsedMessages[i] || '',
+        };
+      });
+    }, [messages, parsedMessages]);
+
+    const enhancePromptCallback = useCallback(() => {
+      enhancePrompt(
+        input,
+        (input) => {
+          setInput(input);
+          scrollTextArea();
+        },
+        model,
+        provider,
+        apiKeys,
+      );
+    }, [enhancePrompt, input, scrollTextArea, model, provider, apiKeys, setInput]);
+
+    const clearAlertCallback = useCallback(() => workbenchStore.clearAlert(), []);
     
     return (
       <BaseChat
@@ -506,34 +537,14 @@ export const ChatImpl = memo(
         description={description}
         importChat={importChat}
         exportChat={exportChat}
-        messages={messages.map((message, i) => {
-          if (message.role === 'user') {
-            return message;
-          }
-
-          return {
-            ...message,
-            content: parsedMessages[i] || '',
-          };
-        })}
-        enhancePrompt={() => {
-          enhancePrompt(
-            input,
-            (input) => {
-              setInput(input);
-              scrollTextArea();
-            },
-            model,
-            provider,
-            apiKeys,
-          );
-        }}
+        messages={processedMessages}
+        enhancePrompt={enhancePromptCallback}
         uploadedFiles={uploadedFiles}
         setUploadedFiles={setUploadedFiles}
         imageDataList={imageDataList}
         setImageDataList={setImageDataList}
         actionAlert={actionAlert}
-        clearAlert={() => workbenchStore.clearAlert()}
+        clearAlert={clearAlertCallback}
         data={chatData}
       />
     );

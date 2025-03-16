@@ -64,7 +64,6 @@ export default class AnthropicProvider extends BaseProvider {
     //   baseUrl: 'https://api.openai-proxy.org/anthropic/v1',
     // });
 
-    console.log('*****************', model, process.env.OPEN_ROUTER_API_KEY);
     return anthropic(model);
   };
 }

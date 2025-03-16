@@ -1,5 +1,5 @@
 import { useSearchParams, useRouter, useParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { atom } from 'nanostores';
 import type { Message } from 'ai';
 import { toast } from 'react-toastify';
@@ -33,11 +33,16 @@ const debouncedSaveChat = debounce(async (params: {
   description: string | undefined;
   metadata: IChatMetadata | undefined;
 }) => {
-  await fetch('/api/chats', {
-    method: 'POST',
-    body: JSON.stringify(params),
-  });
-}, 1000);
+  try {
+    await fetch('/api/chats', {
+      method: 'POST',
+      body: JSON.stringify(params),
+    });
+  } catch (error) {
+    console.error('Failed to save chat:', error);
+    // 不在这里显示 toast，避免频繁弹出错误提示
+  }
+}, 2000);
 
 export function useChatHistory() {
   // 替换 useNavigate
@@ -52,6 +57,8 @@ export function useChatHistory() {
   const [initialMessages, setInitialMessages] = useState<Message[]>([]);
   const [ready, setReady] = useState<boolean>(false);
   const [urlId, setUrlId] = useState<string | undefined>();
+  // 添加消息缓存，用于比较是否需要保存
+  const lastSavedMessagesRef = useRef<string>('');
 
   useEffect(() => {
 
@@ -120,6 +127,15 @@ export function useChatHistory() {
     },
     storeMessageHistory: async (messages: Message[]) => {
       if (messages.length === 0) return;
+
+      // 比较消息是否有实质性变化，避免不必要的保存
+      const messagesJson = JSON.stringify(messages.map(m => ({ id: m.id, content: m.content, role: m.role })));
+      if (messagesJson === lastSavedMessagesRef.current) {
+        return; // 如果消息没有变化，直接返回
+      }
+      
+      // 更新缓存
+      lastSavedMessagesRef.current = messagesJson;
 
       const { firstArtifact } = workbenchStore;
       const currentId = chatId.get();

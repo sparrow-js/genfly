@@ -46,7 +46,8 @@ export class WorkbenchStore {
   #terminalStore = new TerminalStore(webcontainer);
 
   #reloadedMessages = new Set<string>();
-
+  #pendingFileUpdates = new Map<string, string>(); // 缓存待更新的文件
+  #fileUpdateTimer: number | null = null; // 批处理定时器
 
   artifacts: Artifacts = map({});
   startStreaming: WritableAtom<boolean> = atom(false);
@@ -345,17 +346,29 @@ export class WorkbenchStore {
       return;
     }
 
+    // 使用 requestIdleCallback 或 setTimeout 延迟非关键操作
+    const delayNonCriticalOperation = (callback: () => void) => {
+      if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+        (window as any).requestIdleCallback(() => callback(), { timeout: 500 });
+      } else {
+        setTimeout(callback, 0);
+      }
+    };
+
     if (data.action.type === 'file') {
       // const wc = await webcontainer;
       const fullPath = path.join('/home/project', data.action.filePath);
 
-      if (this.selectedFile.value !== fullPath) {
-        this.setSelectedFile(fullPath);
-      }
-
-      if (this.currentView.value !== 'code' && this.hasSendLLM.get()) {
-        this.currentView.set('code');
-      }
+      // 延迟执行非关键的 UI 更新操作
+      delayNonCriticalOperation(() => {
+        if (this.selectedFile.value !== fullPath) {
+          this.setSelectedFile(fullPath);
+        }
+  
+        if (this.currentView.value !== 'code' && this.hasSendLLM.get()) {
+          this.currentView.set('code');
+        }
+      });
 
       const doc = this.#editorStore.documents.get()[fullPath];
 
@@ -363,11 +376,16 @@ export class WorkbenchStore {
         await artifact.runner.runAction(data, isStreaming);
       }
 
-      this.#editorStore.updateFile(fullPath, data.action.content);
+      // 使用批处理更新文件，而不是立即更新
+      this.#pendingFileUpdates.set(fullPath, data.action.content);
+      this.batchUpdateFiles();
 
       if (!isStreaming) {
         await artifact.runner.runAction(data);
-        this.resetAllFileModifications();
+        // 延迟执行非关键操作
+        delayNonCriticalOperation(() => {
+          this.resetAllFileModifications();
+        });
       }
     } else {
       await artifact.runner.runAction(data);
@@ -376,7 +394,7 @@ export class WorkbenchStore {
 
   actionStreamSampler = createSampler(async (data: ActionCallbackData, isStreaming: boolean = false) => {
     return await this._runAction(data, isStreaming);
-  }, 100); // TODO: remove this magic number to have it configurable
+  }, 300); // 增加采样间隔，从100ms改为300ms
 
   #getArtifact(id: string) {
     const artifacts = this.artifacts.get();
@@ -627,6 +645,25 @@ export class WorkbenchStore {
 
   updateLoadingProgress(progress: number) {
     this.#previewsStore.updateLoadingProgress(progress);
+  }
+
+  // 批量更新文件
+  batchUpdateFiles() {
+    if (this.#fileUpdateTimer !== null) {
+      return;
+    }
+
+    this.#fileUpdateTimer = window.setTimeout(() => {
+      const updates = new Map(this.#pendingFileUpdates);
+      this.#pendingFileUpdates.clear();
+      this.#fileUpdateTimer = null;
+
+      // 批量处理所有文件更新
+      for (const [filePath, content] of updates.entries()) {
+        this.#editorStore.updateFile(filePath, content);
+        this.#filesStore.setGeneratedFile(filePath);
+      }
+    }, 50); // 50ms 批处理间隔
   }
 }
 

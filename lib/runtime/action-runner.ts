@@ -71,6 +71,7 @@ export class ActionRunner {
   runnerId = atom<string>(`${Date.now()}`);
   actions: ActionsMap = map({});
   onAlert?: (alert: ActionAlert) => void;
+  #fileCache = new Map<string, string>(); // 文件内容缓存
 
   constructor(
     webcontainerPromise: Promise<WebContainer>,
@@ -128,13 +129,30 @@ export class ActionRunner {
 
     this.#updateAction(actionId, { ...action, ...data.action, executed: !isStreaming });
 
-    this.#currentExecutionPromise = this.#currentExecutionPromise
-      .then(() => {
-        return this.#executeAction(actionId, isStreaming);
-      })
-      .catch((error) => {
-        console.error('Action failed:', error);
-      });
+    // 使用 requestAnimationFrame 来延迟执行，避免阻塞主线程
+    if (!isStreaming) {
+      this.#currentExecutionPromise = this.#currentExecutionPromise
+        .then(() => {
+          return new Promise<void>((resolve) => {
+            requestAnimationFrame(() => {
+              this.#executeAction(actionId, isStreaming)
+                .then(resolve)
+                .catch((error) => {
+                  console.error('Action failed:', error);
+                  resolve();
+                });
+            });
+          });
+        });
+    } else {
+      this.#currentExecutionPromise = this.#currentExecutionPromise
+        .then(() => {
+          return this.#executeAction(actionId, isStreaming);
+        })
+        .catch((error) => {
+          console.error('Action failed:', error);
+        });
+    }
 
     await this.#currentExecutionPromise;
 
@@ -275,27 +293,38 @@ export class ActionRunner {
       unreachable('Expected file action');
     }
 
-    // const webcontainer = await this.#webcontainer;
-    // const relativePath = path.relative(webcontainer.workdir, action.filePath);
-
-    // let folder = path.dirname(relativePath);
-
-    // // remove trailing slashes
-    // folder = folder.replace(/\/+$/g, '');
-
-    // if (folder !== '.') {
-    //   try {
-    //     // await webcontainer.fs.mkdir(folder, { recursive: true });
-    //     logger.debug('Created folder', folder);
-    //   } catch (error) {
-    //     logger.error('Failed to create folder\n\n', error);
-    //   }
-    // }
+    // 检查缓存中是否有相同内容的文件，避免重复处理
+    const cacheKey = `${action.filePath}:${action.content.length}:${action.content.substring(0, 100)}`;
+    if (this.#fileCache.has(cacheKey)) {
+      return;
+    }
+    
+    // 更新缓存
+    this.#fileCache.set(cacheKey, action.content);
 
     try {
-      workbenchStore.files.setKey(`/home/project/${action.filePath}`, { type: 'file', content: action.content, isBinary: false });
-      workbenchStore.setGeneratedFile(`/home/project/${action.filePath}`);
-      // await webcontainer.fs.writeFile(relativePath, action.content);
+      // 使用 requestAnimationFrame 延迟文件写入，避免阻塞主线程
+      if (typeof window !== 'undefined' && 'requestAnimationFrame' in window) {
+        await new Promise<void>((resolve) => {
+          window.requestAnimationFrame(() => {
+            workbenchStore.files.setKey(`/home/project/${action.filePath}`, { 
+              type: 'file', 
+              content: action.content, 
+              isBinary: false 
+            });
+            workbenchStore.setGeneratedFile(`/home/project/${action.filePath}`);
+            resolve();
+          });
+        });
+      } else {
+        workbenchStore.files.setKey(`/home/project/${action.filePath}`, { 
+          type: 'file', 
+          content: action.content, 
+          isBinary: false 
+        });
+        workbenchStore.setGeneratedFile(`/home/project/${action.filePath}`);
+      }
+      
       logger.debug(`File written /home/project/${action.filePath}`);
     } catch (error) {
       logger.error('Failed to write file\n\n', error);

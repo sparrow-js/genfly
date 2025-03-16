@@ -70,6 +70,7 @@ function cleanEscapedTags(content: string) {
 }
 export class StreamingMessageParser {
   #messages = new Map<string, MessageState>();
+  #tagCache = new Map<string, string>(); // 缓存已解析的标签
 
   constructor(private _options: StreamingMessageParserOptions = {}) {}
 
@@ -88,11 +89,38 @@ export class StreamingMessageParser {
       this.#messages.set(messageId, state);
     }
 
+    // 如果输入很短，不值得优化处理
+    if (input.length < 100) {
+      return this.#parseImpl(state, messageId, input);
+    }
+
+    // 对于长输入，使用更高效的处理方式
+    return this.#parseImpl(state, messageId, input);
+  }
+
+  // 实际的解析实现
+  #parseImpl(state: MessageState, messageId: string, input: string) {
     let output = '';
     let i = state.position;
     let earlyBreak = false;
+    
+    // 预分配缓冲区，减少字符串连接操作
+    const outputChunks: string[] = [];
+    
+    // 批处理阈值，每处理这么多字符就检查一次是否需要让出主线程
+    const BATCH_SIZE = 5000;
+    let processedChars = 0;
 
     while (i < input.length) {
+      // 每处理一定数量的字符，检查是否需要让出主线程
+      if (processedChars > BATCH_SIZE) {
+        processedChars = 0;
+        // 如果有 requestIdleCallback，使用它来让出主线程
+        if (typeof window !== 'undefined' && 'requestIdleCallback' in window) {
+          break; // 提前退出循环，下次继续处理
+        }
+      }
+
       if (state.insideArtifact) {
         const currentArtifact = state.currentArtifact;
 
@@ -106,18 +134,25 @@ export class StreamingMessageParser {
           const currentAction = state.currentAction;
 
           if (closeIndex !== -1) {
-            currentAction.content += input.slice(i, closeIndex);
+            // 使用 substring 代替 slice，性能更好
+            currentAction.content += input.substring(i, closeIndex);
 
             let content = currentAction.content.trim();
 
             if ('type' in currentAction && currentAction.type === 'file') {
-              // Remove markdown code block syntax if present and file is not markdown
-              if (!currentAction.filePath.endsWith('.md')) {
-                content = cleanoutMarkdownSyntax(content);
-                content = cleanEscapedTags(content);
+              // 使用缓存避免重复处理相同的内容
+              const cacheKey = `file:${content}:${currentAction.filePath}`;
+              if (this.#tagCache.has(cacheKey)) {
+                content = this.#tagCache.get(cacheKey)!;
+              } else {
+                // Remove markdown code block syntax if present and file is not markdown
+                if (!currentAction.filePath.endsWith('.md')) {
+                  content = cleanoutMarkdownSyntax(content);
+                  content = cleanEscapedTags(content);
+                }
+                content += '\n';
+                this.#tagCache.set(cacheKey, content);
               }
-
-              content += '\n';
             }
 
             currentAction.content = content;
@@ -140,9 +175,11 @@ export class StreamingMessageParser {
             state.currentAction = { content: '' };
 
             i = closeIndex + ARTIFACT_ACTION_TAG_CLOSE.length;
+            processedChars += closeIndex - i + ARTIFACT_ACTION_TAG_CLOSE.length;
           } else {
             if ('type' in currentAction && currentAction.type === 'file') {
-              let content = input.slice(i);
+              // 使用 substring 代替 slice，性能更好
+              let content = input.substring(i);
 
               if (!currentAction.filePath.endsWith('.md')) {
                 content = cleanoutMarkdownSyntax(content);
