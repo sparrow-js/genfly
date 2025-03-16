@@ -295,26 +295,38 @@ Here are some examples of correct usage of artifacts:
 export const CONTINUE_PROMPT = stripIndents`
   Continue your prior response. 
   - ULTRA IMPORTANT: Immediately begin from where you left off without any interruptions.
-  - ULTRA IMPORTANT: Do not repeat any content, including artifact and action tags.
-  - ULTRA IMPORTANT: Forbid any repetition of content, including artifact and action tags.
-  - ULTRA IMPORTANT: Do not repeat any content, including <boltArtifact> and <boltAction> tags.
+  - ULTRA IMPORTANT: Forbid any repeat of content, including artifact and action tags.
   - ULTRA IMPORTANT: Start immediately from where you last left off, and the connection must not repeat the content from the previous time.
 
-  Example of a mistake:
-    Interruption point:
-      import { 
-        Code, Database, Globe, Layout, Palette, Server, 
-        Smartphone, Terminal, Zap
-      } from 'lucide-react';
+  Example of a mistake 1:
+    - Interruption point:
+import { 
+  Code, Database, Globe, Layout, Palette, Server, 
+  Smartphone, Terminal, Zap
+} from 'lucide-react';
 
-      // Skill categories with their respective skills
-      const skillCategories = [
-        {
-          id: 1,
-          name: 
-    Start of a new response:
-      '<boltAction type="file" filePath="src/components/Skills.tsx">
-  import { 
+// Skill categories with their respective skills
+const skillCategories = [
+  {
+    id: 1,
+    name: 
+    - Start of a new response:
+    '<boltAction type="file" filePath="src/components/Skills.tsx">
+import { 
+  Code, Database, Globe, Layout, Palette, Server, 
+  Smartphone, Terminal, Zap
+} from 'lucide-react';
+
+// Skill categories with their respective skills
+const skillCategories = [
+  {
+    id: 1,
+    name: 'Frontend Development',
+
+     
+  Correct example 1:
+   - Interruption point:
+import { 
     Code, Database, Globe, Layout, Palette, Server, 
     Smartphone, Terminal, Zap
   } from 'lucide-react';
@@ -323,24 +335,60 @@ export const CONTINUE_PROMPT = stripIndents`
   const skillCategories = [
     {
       id: 1,
-      name: 'Frontend Development',
-     
-  Correct example:
-   Interruption point:
-      import { 
-        Code, Database, Globe, Layout, Palette, Server, 
-        Smartphone, Terminal, Zap
-      } from 'lucide-react';
+      name: 
 
-      // Skill categories with their respective skills
-      const skillCategories = [
-        {
-          id: 1,
-          name: 
+    - Start of a new response:
+  'Frontend Development',
+  icon: <Layout className="h-8 w-8 text-primary" />,
+  skills: ['HTML5', 'CSS3', 'JavaScript', 'TypeScript', 'React', 'Vue.js', 'Next.js', 'Tailwind CSS', 'Responsive Design']
+},
 
-    Start of a new response:
-    'Frontend Development',
-    icon: <Layout className="h-8 w-8 text-primary" />,
-    skills: ['HTML5', 'CSS3', 'JavaScript', 'TypeScript', 'React', 'Vue.js', 'Next.js', 'Tailwind CSS', 'Responsive Design']
-  },
+
+  Example of a mistake 2:
+    - Interruption point:
+{
+  id: "rev_01",
+  author: {
+    name: "Alex Johnson",
+    avatar: "https://i.pravavatar
+      
+    - Start of a new response:
+: "https://i.pravatar.cc/150?img=1"
+    },
+    rating: 5,
+
+  Correct example 2:
+    - Interruption point:
+{
+  id: "rev_01",
+  author: {
+    name: "Alex Johnson",
+    avatar: "https://i.pravavatar
+
+    - Start of a new response:
+.cc/150?img=1"
+    },
+    rating: 5,
+  }
+ 
+  Example of a mistake 3:
+    - Interruption point:
+      <AccordionItem value="shipping">
+        <AccordionTrigger>Shipping & Returns</AccordionTrigger>
+        <AccordionContent>
+
+    - Start of a new response:
+        <AccordionContent>
+          <div className="space-y-2 text-sm text-muted-foreground">
+
+
+  Correct example 3:
+    - Interruption point:
+      <AccordionItem value="shipping">
+        <AccordionTrigger>Shipping & Returns</AccordionTrigger>
+        <AccordionContent>
+
+    - Start of a new response:
+        <div className="space-y-2 text-sm text-muted-foreground">
+
 `;
