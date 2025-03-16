@@ -191,6 +191,8 @@ export const ChatImpl = memo(
           while (workbenchStore.deploymentStatus.get() !== 'completed') {
             await new Promise(resolve => setTimeout(resolve, 100));
           }
+
+          workbenchStore.saveAllFiles();
           // @ts-ignore
           const uploadedFiles = workbenchStore.getGeneratedFiles().values()?.toArray();
           if (uploadedFiles.length > 0) {
