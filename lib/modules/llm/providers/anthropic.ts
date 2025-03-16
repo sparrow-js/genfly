@@ -3,6 +3,8 @@ import type { ModelInfo } from '@/lib/modules/llm/types';
 import type { LanguageModelV1 } from 'ai';
 import type { IProviderSetting } from '@/types/model';
 import { createAnthropic } from '@ai-sdk/anthropic';
+import { createOpenAI } from '@ai-sdk/openai';
+
 
 export default class AnthropicProvider extends BaseProvider {
   name = 'Anthropic';
@@ -14,7 +16,7 @@ export default class AnthropicProvider extends BaseProvider {
 
   staticModels: ModelInfo[] = [
     {
-      name: 'claude-3-7-sonnet-20250219',
+      name: 'anthropic/claude-3.7-sonnet',
       label: 'Claude 3.7 Sonnet',
       provider: 'Anthropic',
       maxTokenAllowed: 8000,
@@ -52,16 +54,17 @@ export default class AnthropicProvider extends BaseProvider {
       defaultBaseUrlKey: '',
       defaultApiTokenKey: 'ANTHROPIC_API_KEY',
     });
-    // const anthropic = createAnthropic({
-    //   apiKey: "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",
-    //   baseURL: "https://openrouter.ai/api/v1"
-    // });
-
-    const anthropic = createAnthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
-      baseUrl: 'https://api.openai-proxy.org/anthropic/v1',
+    const anthropic = createOpenAI({
+      apiKey: process.env.OPEN_ROUTER_API_KEY,
+      baseURL: "https://openrouter.ai/api/v1"
     });
 
+    // const anthropic = createAnthropic({
+    //   apiKey: process.env.ANTHROPIC_API_KEY,
+    //   baseUrl: 'https://api.openai-proxy.org/anthropic/v1',
+    // });
+
+    console.log('*****************', model, process.env.OPEN_ROUTER_API_KEY);
     return anthropic(model);
   };
 }
