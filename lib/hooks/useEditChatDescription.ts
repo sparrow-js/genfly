@@ -48,15 +48,12 @@ export function useEditChatDescription({
   }, [customChatId, chatIdFromStore]);
 
   useEffect(() => {
-    console.log('initialDescription **********', initialDescription);
     setCurrentDescription(initialDescription);
   }, [initialDescription]);
 
   const toggleEditMode = useCallback(() => setEditing((prev) => !prev), []);
 
   const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('handleChange **********', e.target.value);
-
     setCurrentDescription(e.target.value);
   }, []);
 
