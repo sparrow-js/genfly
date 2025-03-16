@@ -1,7 +1,7 @@
 import { atom } from 'nanostores';
 import { logStore } from './logs';
 
-export type Theme = 'dark' | 'light';
+export type Theme = 'dark' | 'light' | undefined;
 
 export const kTheme = 'bolt_theme';
 
@@ -11,7 +11,13 @@ export function themeIsDark() {
 
 export const DEFAULT_THEME = 'dark';
 
-export const themeStore = atom<Theme>(DEFAULT_THEME);
+// let persistedTheme: Theme | undefined = undefined;
+
+// // Only access localStorage on the client side
+// if (typeof window !== 'undefined') {
+//   persistedTheme = localStorage.getItem(kTheme) as Theme | undefined;
+// }
+export const themeStore = atom<Theme>(undefined);
 
 
 export function toggleTheme() {
