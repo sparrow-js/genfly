@@ -5,10 +5,10 @@ import { deployApp } from '@/utils/machines';
 import { auth } from 'auth';
 
 const logger = createScopedLogger('api.deploy');
+
 export const runtime = 'edge';
+
 export async function POST(request: Request) {
-
-
 
   try {
     const data: { appName: string } = await request.json();
