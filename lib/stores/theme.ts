@@ -41,5 +41,5 @@ export function toggleTheme() {
   }
 
   logStore.logSystem(`Theme changed to ${newTheme} mode`);
-  location.reload();
+  // location.reload();
 }

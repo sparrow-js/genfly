@@ -177,64 +177,67 @@ export const ControlPanel = ({ open, onClose }: ControlPanelProps) => {
 
   // Add visibleTabs logic using useMemo with optimized calculations
   const visibleTabs = useMemo(() => {
-    if (!tabConfiguration?.userTabs || !Array.isArray(tabConfiguration.userTabs)) {
-      console.warn('Invalid tab configuration, resetting to defaults');
-      resetTabConfiguration();
 
-      return [];
-    }
+    return [];
 
-    const notificationsDisabled = profile?.preferences?.notifications === false;
+    // if (!tabConfiguration?.userTabs || !Array.isArray(tabConfiguration.userTabs)) {
+    //   console.warn('Invalid tab configuration, resetting to defaults');
+    //   resetTabConfiguration();
 
-    // In developer mode, show ALL tabs without restrictions
-    if (developerMode) {
-      const seenTabs = new Set<TabType>();
-      const devTabs: ExtendedTabConfig[] = [];
+    //   return [];
+    // }
 
-      // Process tabs in order of priority: developer, user, default
-      const processTab = (tab: BaseTabConfig) => {
-        if (!seenTabs.has(tab.id)) {
-          seenTabs.add(tab.id);
-          devTabs.push({
-            id: tab.id,
-            visible: true,
-            window: 'developer',
-            order: tab.order || devTabs.length,
-          });
-        }
-      };
+    // const notificationsDisabled = profile?.preferences?.notifications === false;
 
-      // Process tabs in priority order
-      tabConfiguration.developerTabs?.forEach((tab) => processTab(tab as BaseTabConfig));
-      tabConfiguration.userTabs.forEach((tab) => processTab(tab as BaseTabConfig));
-      DEFAULT_TAB_CONFIG.forEach((tab) => processTab(tab as BaseTabConfig));
+    // // In developer mode, show ALL tabs without restrictions
+    // if (developerMode) {
+    //   const seenTabs = new Set<TabType>();
+    //   const devTabs: ExtendedTabConfig[] = [];
 
-      // Add Tab Management tile
-      devTabs.push({
-        id: 'tab-management' as TabType,
-        visible: true,
-        window: 'developer',
-        order: devTabs.length,
-        isExtraDevTab: true,
-      });
+    //   // Process tabs in order of priority: developer, user, default
+    //   const processTab = (tab: BaseTabConfig) => {
+    //     if (!seenTabs.has(tab.id)) {
+    //       seenTabs.add(tab.id);
+    //       devTabs.push({
+    //         id: tab.id,
+    //         visible: true,
+    //         window: 'developer',
+    //         order: tab.order || devTabs.length,
+    //       });
+    //     }
+    //   };
 
-      return devTabs.sort((a, b) => a.order - b.order);
-    }
+    //   // Process tabs in priority order
+    //   tabConfiguration.developerTabs?.forEach((tab) => processTab(tab as BaseTabConfig));
+    //   tabConfiguration.userTabs.forEach((tab) => processTab(tab as BaseTabConfig));
+    //   DEFAULT_TAB_CONFIG.forEach((tab) => processTab(tab as BaseTabConfig));
 
-    // Optimize user mode tab filtering
-    return tabConfiguration.userTabs
-      .filter((tab) => {
-        if (!tab?.id) {
-          return false;
-        }
+    //   // Add Tab Management tile
+    //   devTabs.push({
+    //     id: 'tab-management' as TabType,
+    //     visible: true,
+    //     window: 'developer',
+    //     order: devTabs.length,
+    //     isExtraDevTab: true,
+    //   });
 
-        if (tab.id === 'notifications' && notificationsDisabled) {
-          return false;
-        }
+    //   return devTabs.sort((a, b) => a.order - b.order);
+    // }
 
-        return tab.visible && tab.window === 'user';
-      })
-      .sort((a, b) => a.order - b.order);
+    // // Optimize user mode tab filtering
+    // return tabConfiguration.userTabs
+    //   .filter((tab) => {
+    //     if (!tab?.id) {
+    //       return false;
+    //     }
+
+    //     if (tab.id === 'notifications' && notificationsDisabled) {
+    //       return false;
+    //     }
+
+    //     return tab.visible && tab.window === 'user';
+    //   })
+    //   .sort((a, b) => a.order - b.order);
   }, [tabConfiguration, developerMode, profile?.preferences?.notifications, baseTabConfig]);
 
   // Optimize animation performance with layout animations
