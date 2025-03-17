@@ -1,6 +1,6 @@
 // app/api/chats/[id]/route.ts
 import { NextResponse } from 'next/server';
-import { db } from '@/db/test';
+import { db } from '@/db';
 import { chats } from '@/db/schema';
 import type { Message } from 'ai';
 import type { IChatMetadata } from '@/lib/persistence/types';

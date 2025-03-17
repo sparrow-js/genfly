@@ -14,6 +14,7 @@ import { auth } from "auth"
 
 const logger = createScopedLogger('api.llmcall');
 
+export const runtime = 'edge';
 async function getModelList(options: {
   apiKeys?: Record<string, string>;
   providerSettings?: Record<string, IProviderSetting>;

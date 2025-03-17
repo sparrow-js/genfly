@@ -5,6 +5,7 @@ import { stripIndents } from '@/utils/stripIndent'; // Adjusted import path
 import type { ProviderInfo } from '@/types/model'; // Adjusted import path
 import { auth } from 'auth';
 
+export const runtime = 'edge';
 export async function POST(request: NextRequest) {
   try {
     const { message, model, provider, apiKeys: providedApiKeys } = await request.json() as {

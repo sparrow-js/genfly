@@ -16,7 +16,7 @@ import { auth } from 'auth';
 
 const logger = createScopedLogger('api.chat');
 
-// export const runtime = 'edge';
+export const runtime = 'edge';
 
 function parseCookies(cookieHeader: string | null): Record<string, string> {
   const cookies: Record<string, string> = {};

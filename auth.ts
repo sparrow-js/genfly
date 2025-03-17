@@ -5,7 +5,7 @@ import GitHub from "next-auth/providers/github"
 import Google from "next-auth/providers/google"
 import { DrizzleAdapter } from "@auth/drizzle-adapter"
 import Notion from "next-auth/providers/notion"
-import { db } from "./db/test"
+import { db } from "./db"
 
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
