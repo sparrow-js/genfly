@@ -44,6 +44,6 @@ export async function GET(
     return NextResponse.json(chat[0]);
   } catch (error) {
     console.error('Failed to fetch chat:', error);
-    return NextResponse.json({ error: 'Failed to fetch chat' }, { status: 500 });
+    return NextResponse.json({ error }, { status: 500 });
   }
 }
