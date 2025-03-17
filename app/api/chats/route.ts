@@ -17,7 +17,6 @@ export async function GET(request: Request) {
           return new NextResponse("Unauthorized", { status: 401 });
       }
 
-
         // 获取当前用户信息
         const userId = session.user.id;
         

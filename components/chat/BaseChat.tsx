@@ -39,6 +39,7 @@ import { LOCAL_PROVIDERS } from '@/lib/stores/settings';
 import { ClientOnly } from '@/components/ClientOnly';
 import { SidebarLeft } from '@/components/sidebar/left';
 import { useSession } from "next-auth/react"
+import { LoginModal } from '@/components/auth/LoginModal';
 
 
 const TEXTAREA_MIN_HEIGHT = 76;
@@ -120,7 +121,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
     const [isModelLoading, setIsModelLoading] = useState<string | undefined>('all');
     const [progressAnnotations, setProgressAnnotations] = useState<ProgressAnnotation[]>([]);
     const { data: session } = useSession();
-
+    const [showLoginModal, setShowLoginModal] = useState(false);
     useEffect(() => {
       if (data) {
         const progressList = data.filter(
@@ -486,6 +487,11 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
 
                           event.preventDefault();
 
+                          if(!session) {
+                            setShowLoginModal(true);
+                            return;
+                          }
+
                           if (isStreaming) {
                             handleStop?.();
                             return;
@@ -495,6 +501,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                           if (event.nativeEvent.isComposing) {
                             return;
                           }
+
 
                           handleSendMessage?.(event);
                         }
@@ -516,6 +523,12 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                           isStreaming={isStreaming}
                           disabled={!providerList || providerList.length === 0}
                           onClick={(event) => {
+
+                            if(!session) {
+                              setShowLoginModal(true);
+                              return;
+                            }
+
                             if (isStreaming) {
                               handleStop?.();
                               return;
@@ -533,7 +546,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                         </IconButton>
                         <IconButton
                           title="Enhance prompt"
-                          disabled={input.length === 0 || enhancingPrompt}
+                          disabled={input?.length === 0 || enhancingPrompt}
                           className={classNames('transition-all', enhancingPrompt ? 'opacity-100' : '')}
                           onClick={() => {
                             enhancePrompt?.();
@@ -608,6 +621,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
           </div>
           <Workbench chatStarted={chatStarted} isStreaming={isStreaming} sendMessage={sendMessage} />
         </div>
+        <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
       </div>
     );
 
