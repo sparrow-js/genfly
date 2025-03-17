@@ -1,10 +1,10 @@
 // app/api/chats/[id]/route.ts
 import { NextResponse } from 'next/server';
-import { db } from '@/db';
+import { withDb} from '@/db/edge-db';
 import { chats } from '@/db/schema';
 import type { Message } from 'ai';
 import type { IChatMetadata } from '@/lib/persistence/types';
-// import { auth } from 'auth';
+import { auth } from 'auth';
 import { desc, eq } from 'drizzle-orm';
 
 
@@ -12,15 +12,14 @@ export const runtime = 'edge';
 
 export async function GET(request: Request) {
     try {
-      // const session = await auth();
-      // if (!session?.user) {
-      //     return new NextResponse("Unauthorized", { status: 401 });
-      // }
+      const session = await auth();
+      if (!session?.user) {
+          return new NextResponse("Unauthorized", { status: 401 });
+      }
 
 
         // 获取当前用户信息
-        // const userId = session.user.id;
-        const userId = 'e808b06d-ebb1-4ea7-9bf8-ba4ad3f57f6a'
+        const userId = session.user.id;
         
         // 确保userId不为undefined
         if (!userId) {
@@ -30,7 +29,7 @@ export async function GET(request: Request) {
         // 选择除messages以外的所有字段
         // const db = getDb();
        try {
-        const allChats = await db.select({
+        const allChats = await withDb(db => db.select({
           id: chats.id,
           userId: chats.userId,
           urlId: chats.urlId,
@@ -40,7 +39,7 @@ export async function GET(request: Request) {
       }).from(chats)
         .where(eq(chats.userId, userId))
         .orderBy(desc(chats.timestamp))
-        
+        );
         // const allChats = await withDb(db => );
         
         return NextResponse.json(allChats);
@@ -57,10 +56,10 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  // const session = await auth();
-  // if (!session?.user) {
-  //   return new NextResponse("Unauthorized", { status: 401 });
-  // }
+  const session = await auth();
+  if (!session?.user) {
+    return new NextResponse("Unauthorized", { status: 401 });
+  }
 
   const { id, messages, urlId, description, timestamp, metadata } = await request.json() as {
     id: string;
@@ -79,7 +78,7 @@ export async function POST(request: Request) {
 
     // const db = getDb();
 
-    const result = await db
+    const result = await withDb(db => db
     .insert(chats)
     .values({
       id,
@@ -88,7 +87,7 @@ export async function POST(request: Request) {
       description,
       timestamp: timestamp ? new Date(timestamp) : new Date(),
       metadata,
-      userId: 'guest',
+      userId: session?.user?.id || 'guest',
     })
     .onConflictDoUpdate({
       target: chats.id,
@@ -99,7 +98,8 @@ export async function POST(request: Request) {
         timestamp: timestamp ? new Date(timestamp) : new Date(),
       },
     })
-    .returning();
+    .returning()
+    );
 
     // const result = await withDb(async (db) => {
     //   return db

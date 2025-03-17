@@ -11,7 +11,7 @@ import { Pool } from '@neondatabase/serverless';
 import * as schema from "./schema";
 
 // const client = postgres(env.DATABASE_URL);
-const client = new Pool({ connectionString: "postgresql://postgres.kvdceclxeyjewlodlncc:3O7Z3osrNPdjSrcM@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres"});
+const client = new Pool({ connectionString: "postgresql://postgres.kvdceclxeyjewlodlncc:3O7Z3osrNPdjSrcM@aws-0-ap-southeast-1.pooler.supabase.com:6543/postgres"});
 
 export const db = drizzle(client, { schema, logger: true });
 
