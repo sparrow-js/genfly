@@ -346,7 +346,18 @@ export const ChatImpl = memo(
                 {
                   id: `${new Date().getTime()}`,
                   role: 'user',
-                  content: messageContent,
+                  // content: messageContent,
+                  content: [
+                    {
+                      type: 'text',
+                      text: messageContent,
+                    },
+                    ...imageDataList.map((imageData) => ({
+                      type: 'image',
+                      image: imageData,
+                    })),
+                  ] as any,
+
                 },
                 {
                   id: `${new Date().getTime()}`,
