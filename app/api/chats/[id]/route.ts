@@ -10,8 +10,6 @@ const isUUID = (str: string) => {
 };
 
 
-export const runtime = 'edge';
-
 export async function GET(
     request: Request, 
     { params }: { params: Promise<{ id: string }> } // 类型定义

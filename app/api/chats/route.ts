@@ -11,13 +11,13 @@ import { desc, eq } from 'drizzle-orm';
 // export const runtime = 'edge';
 
 export async function GET(request: Request) {
-
-    const session = await auth();
-    if (!session?.user) {
-        return new NextResponse("Unauthorized", { status: 401 });
-    }
-
     try {
+      const session = await auth();
+      if (!session?.user) {
+          return new NextResponse("Unauthorized", { status: 401 });
+      }
+
+
         // 获取当前用户信息
         const userId = session.user.id;
         
