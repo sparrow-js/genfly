@@ -206,10 +206,11 @@ export const ChatImpl = memo(
               })
               .filter((file: any): file is { path: string; content: string } => file !== null);
 
-              workbenchStore.saveAllFiles();
             console.log('uploadedFiles length', validFiles.length);
 
             workbenchStore.uploadFilesTomachine(validFiles);
+            workbenchStore.saveAllFiles();
+            workbenchStore.resetGeneratedFiles();
           }
         }, 1000);
       },
