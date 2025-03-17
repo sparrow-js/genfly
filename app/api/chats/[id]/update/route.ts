@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { withDb } from '@/db';
+import { db, withDb } from '@/db';
 import { chats } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import type { ChatHistoryItem } from "@/lib/persistence/types";

@@ -1,6 +1,6 @@
 // app/api/chats/[id]/route.ts
 import { NextResponse } from 'next/server';
-import { withDb } from '@/db';
+import { db } from '@/db';
 import { chats } from '@/db/schema';
 import { eq } from 'drizzle-orm';
 import { auth } from 'auth';
@@ -31,13 +31,11 @@ export async function GET(
   }
 
   try {
-    const chat = await withDb(db =>
-      db
-        .select()
-        .from(chats)
-        .where(isUUID(id) ? eq(chats.id, id) : eq(chats.urlId, id))
-        .limit(1)
-    );
+    const chat = await db
+      .select()
+      .from(chats)
+      .where(isUUID(id) ? eq(chats.id, id) : eq(chats.urlId, id))
+      .limit(1)
 
     if (!chat.length) {
       return NextResponse.json({ error: 'Chat not found' }, { status: 404 });
