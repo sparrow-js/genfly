@@ -27,7 +27,7 @@ export {
   // HyperbolicProvider,
   // MistralProvider,
   // OllamaProvider,
-  OpenAIProvider,
+  // OpenAIProvider,
   // OpenRouterProvider,
   // OpenAILikeProvider,
   // PerplexityProvider,
