@@ -4,7 +4,7 @@ import { db } from '@/db';
 import { chats } from '@/db/schema';
 import type { Message } from 'ai';
 import type { IChatMetadata } from '@/lib/persistence/types';
-import { auth } from 'auth';
+// import { auth } from 'auth';
 import { desc, eq } from 'drizzle-orm';
 
 
@@ -12,14 +12,15 @@ export const runtime = 'edge';
 
 export async function GET(request: Request) {
     try {
-      const session = await auth();
-      if (!session?.user) {
-          return new NextResponse("Unauthorized", { status: 401 });
-      }
+      // const session = await auth();
+      // if (!session?.user) {
+      //     return new NextResponse("Unauthorized", { status: 401 });
+      // }
 
 
         // 获取当前用户信息
-        const userId = session.user.id;
+        // const userId = session.user.id;
+        const userId = 'e808b06d-ebb1-4ea7-9bf8-ba4ad3f57f6a'
         
         // 确保userId不为undefined
         if (!userId) {
@@ -56,10 +57,10 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const session = await auth();
-  if (!session?.user) {
-    return new NextResponse("Unauthorized", { status: 401 });
-  }
+  // const session = await auth();
+  // if (!session?.user) {
+  //   return new NextResponse("Unauthorized", { status: 401 });
+  // }
 
   const { id, messages, urlId, description, timestamp, metadata } = await request.json() as {
     id: string;
@@ -87,7 +88,7 @@ export async function POST(request: Request) {
       description,
       timestamp: timestamp ? new Date(timestamp) : new Date(),
       metadata,
-      userId: session?.user?.id || 'guest',
+      userId: 'guest',
     })
     .onConflictDoUpdate({
       target: chats.id,
