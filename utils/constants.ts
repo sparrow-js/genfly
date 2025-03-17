@@ -32,5 +32,15 @@ export const STARTER_TEMPLATES: Template[] = [
     githubRepo: 'sparrow-js/vite-ts-template',
     tags: ['react', 'vite', 'frontend'],
     icon: 'i-bolt:react',
+    categorys: ['Landing Page', 'Marketing Tool', 'Information Collection Tool']
+  },
+  {
+    name: 'vite-ts-sass-template',
+    label: 'React + Vite + typescript',
+    description: 'React starter template powered by Vite for fast development experience',
+    githubRepo: 'sparrow-js/vite-ts-sass-template',
+    tags: ['react', 'vite', 'frontend'],
+    icon: 'i-bolt:react',
+    categorys: ['SaaS System', 'Cloud Management System', 'Subscription Service System', 'Dashboard System']
   }
 ];

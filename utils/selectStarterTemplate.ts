@@ -15,6 +15,7 @@ ${templates
   <name>${template.name}</name>
   <description>${template.description}</description>
   ${template.tags ? `<tags>${template.tags.join(', ')}</tags>` : ''}
+  ${template.categorys ? `<categorys>${template.categorys.join(', ')}</categorys>` : ''}
 </template>
 `,
   )
