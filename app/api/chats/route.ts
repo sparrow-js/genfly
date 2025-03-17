@@ -8,7 +8,7 @@ import { auth } from 'auth';
 import { desc, eq } from 'drizzle-orm';
 
 
-export const runtime = 'edge';
+// export const runtime = 'edge';
 
 export async function GET(request: Request) {
 
