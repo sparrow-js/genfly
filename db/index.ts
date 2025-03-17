@@ -15,9 +15,6 @@ const client = new Pool({ connectionString: "postgresql://postgres.kvdceclxeyjew
 
 export const db = drizzle(client, { schema, logger: true });
 
-
-
-
 // 创建一个获取数据库连接的工厂函数
 export function getDb() {
   return db
