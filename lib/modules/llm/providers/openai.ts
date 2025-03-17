@@ -80,7 +80,6 @@ export default class OpenAIProvider extends BaseProvider {
       throw new Error(`Missing API key for ${this.name} provider`);
     }
 
-    console.log('apiKey **************', process.env.OPEN_ROUTER_API_KEY, model);
 
     const openai = createOpenAI({
       apiKey: process.env.OPEN_ROUTER_API_KEY,

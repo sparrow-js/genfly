@@ -192,9 +192,9 @@ export const ChatImpl = memo(
             await new Promise(resolve => setTimeout(resolve, 100));
           }
 
-          workbenchStore.saveAllFiles();
           // @ts-ignore
           const uploadedFiles = workbenchStore.getGeneratedFiles().values()?.toArray();
+
           if (uploadedFiles.length > 0) {
             const validFiles = uploadedFiles
               .map((file: any) => {
@@ -205,10 +205,13 @@ export const ChatImpl = memo(
                 } : null;
               })
               .filter((file: any): file is { path: string; content: string } => file !== null);
-              
+
+              workbenchStore.saveAllFiles();
+            console.log('uploadedFiles length', validFiles.length);
+
             workbenchStore.uploadFilesTomachine(validFiles);
           }
-        }, 10);
+        }, 1000);
       },
       initialMessages,
       initialInput: Cookies.get(PROMPT_COOKIE_KEY) || '',
