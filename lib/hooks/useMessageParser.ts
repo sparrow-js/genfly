@@ -74,6 +74,13 @@ const messageParser = new StreamingMessageParser({
         workbenchStore.setGeneratedFile(`/home/project/${data.action.filePath}`);
       }
 
+      if (data.action.type === 'shell') {
+        if (data.action.content.includes('npm install ')) {
+          console.log('npm install ************** content', data.action.content);
+          workbenchStore.installDependencies.set(data.action.content);
+        }
+      }
+
       logger.trace('onActionStream', data.action);
       
       // 使用节流版本的 runAction 减少频繁调用

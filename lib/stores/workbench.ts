@@ -61,6 +61,8 @@ export class WorkbenchStore {
 
   hasSendLLM: WritableAtom<boolean> = atom(false);
 
+  installDependencies: WritableAtom<string> = atom('');
+
   showWorkbench: WritableAtom<boolean> = atom(false);
   currentView: WritableAtom<WorkbenchViewType> = atom('code');
   unsavedFiles: WritableAtom<Set<string>> = atom(new Set<string>());
@@ -587,7 +589,7 @@ export class WorkbenchStore {
     }
   }
 
-  async uploadFilesTomachine(files: { path: string, content: string }[]) {
+  async uploadFilesTomachine(files: { path: string, content: string }[], installDependencies: string) {
 
     try {
         this.currentView.set('preview');
@@ -596,6 +598,7 @@ export class WorkbenchStore {
           body: JSON.stringify({
             appName: appId.get(),
             files: files,
+            installDependencies: installDependencies,
           }),
         });
         
@@ -610,6 +613,8 @@ export class WorkbenchStore {
             source: 'preview',
           });
         }
+
+        workbenchStore.installDependencies.set('');
 
         workbenchStore.previews.set([{
           port: 3000,

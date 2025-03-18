@@ -210,7 +210,7 @@ export const ChatImpl = memo(
 
             console.log('uploadedFiles length', validFiles.length);
 
-            workbenchStore.uploadFilesTomachine(validFiles);
+            workbenchStore.uploadFilesTomachine(validFiles, workbenchStore.installDependencies.get());
             workbenchStore.saveAllFiles();
 
             if (workbenchStore.genType.get() === 'fix-error') {

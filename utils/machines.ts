@@ -235,7 +235,7 @@ export const getMachine = async (appName: string) => {
 };
 
 
-export const updateFileList = async (appName: string, files: Array<{path: string, content: string}>) => {
+export const updateFileList = async (appName: string, files: Array<{path: string, content: string}>, installDependencies: string) => {
     const machine = await ensureMachineReady(appName);
 
     const execUrl = `https://api.machines.dev/v1/apps/${appName}/machines/${machine.id}/exec`;
@@ -466,8 +466,9 @@ export const updateFileList = async (appName: string, files: Array<{path: string
     console.log(`Processed ${totalProcessed}/${files.length} files, success: ${allSuccessful}`);
     
     // 如果有package.json文件，重新安装依赖
-    if (filePath.find((key: any) => key.includes('package.json'))) {
-        const reinstallResult = await reinstallDependencies(appName);
+    const hasPackageJson = filePath.find((key: any) => key.includes('package.json'));
+    if (hasPackageJson || installDependencies) {
+        const reinstallResult = await reinstallDependencies(appName, installDependencies, hasPackageJson);
         console.log('Reinstall dependencies result:', reinstallResult);
     }
     
@@ -685,7 +686,7 @@ export const executeCommand = async (appId: string, machineId: string, command: 
   }
 };
 
-export const reinstallDependencies = async (appId: string) => {
+export const reinstallDependencies = async (appId: string, installDependencies: string, hasPackageJson: boolean) => {
   try {
     const machine = await getMachine(appId);
     if (!machine) {
@@ -699,7 +700,11 @@ export const reinstallDependencies = async (appId: string) => {
       // First navigate to the app directory
       const cdResult = await executeCommand(appId, machine.id, ['sh', '-c', 'cd /app']);
       console.log('Changed to app directory:', cdResult);
-      
+      let installCommand = 'npm install';
+      if (!hasPackageJson && installDependencies) {
+        installCommand = installDependencies;
+      }
+
       // Run npm install in the app directory
       installResult = await executeCommand(appId, machine.id, ['sh', '-c', 'cd /app && npm install']);
             
