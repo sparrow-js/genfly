@@ -241,32 +241,85 @@ export const updateFileList = async (appName: string, files: Array<{path: string
     const execUrl = `https://api.machines.dev/v1/apps/${appName}/machines/${machine.id}/exec`;
     const filePath = files.map((file: any) => file.path);
     
-    // Reduce batch size to handle payload size limitations
-    const BATCH_SIZE = 10;
-    const batches = [];
-
-    let firstTag = true;
+    // 创建基于文件大小的批次
+    const MAX_BATCH_SIZE_KB = 20; // 最大批次大小，单位KB
+    const MAX_BATCH_SIZE = MAX_BATCH_SIZE_KB * 1024; // 转换为字节
+    const MAX_CONCURRENT_BATCHES = 5; // 最大并发批次数
     
-    for (let i = 0; i < files.length; i += BATCH_SIZE) {
-        batches.push(files.slice(i, i + BATCH_SIZE));
+    // 根据文件大小分组
+    const batches: Array<Array<{path: string, content: string}>> = [];
+    let currentBatch: Array<{path: string, content: string}> = [];
+    let currentBatchSize = 0;
+    
+    // 首先估算每个文件的大小并进行分组
+    for (const file of files) {
+        const estimatedSize = new TextEncoder().encode(file.content).length;
+        
+        // 如果文件本身就超过限制，单独放一个批次
+        if (estimatedSize > MAX_BATCH_SIZE) {
+            console.log(`Large file ${file.path}: ${(estimatedSize/1024).toFixed(2)}KB, adding as separate batch`);
+            batches.push([file]);
+            continue;
+        }
+        
+        // 如果添加此文件后会超出批次大小限制，创建新批次
+        if (currentBatchSize + estimatedSize > MAX_BATCH_SIZE) {
+            if (currentBatch.length > 0) {
+                batches.push(currentBatch);
+                currentBatch = [];
+                currentBatchSize = 0;
+            }
+        }
+        
+        // 将文件添加到当前批次
+        currentBatch.push(file);
+        currentBatchSize += estimatedSize;
     }
     
+    // 添加最后一个批次（如果有的话）
+    if (currentBatch.length > 0) {
+        batches.push(currentBatch);
+    }
+    
+    console.log(`Created ${batches.length} batches from ${files.length} files`, batches);
+    
+    // 处理所有批次，允许并行
     const results = [];
     
-    // Process each batch
-    for (const batch of batches) {
+    // 处理单个批次的函数
+    async function processBatch(batch: Array<{path: string, content: string}>) {
         try {
-            // Process files one by one within each batch to avoid payload issues
-            for (const file of batch) {
+            console.log(`Processing batch with ${batch.length} files`);
+            
+            // 准备批量上传的文件内容
+            const batchFileOps = await Promise.all(batch.map(async (file) => {
                 const safeFilePath = file.path.replace(/[^a-zA-Z0-9\/._-]/g, '');
                 
-                // Create directory first
+                // 压缩文件内容
+                const contentBuffer = new TextEncoder().encode(file.content);
+                const compressedContent = await new Promise((resolve, reject) => {
+                    try {
+                        const data = gzip(contentBuffer);
+                        resolve(data);
+                    } catch (err) {
+                        reject(err);
+                    }
+                });
+                const base64CompressedContent = arrayBufferToBase64(compressedContent);
+                
+                return {
+                    path: safeFilePath,
+                    content: base64CompressedContent
+                };
+            }));
+            
+            // 为每个文件创建目录
+            for (const fileOp of batchFileOps) {
                 const mkdirCommand = [
                     "sh", "-c",
-                    `mkdir -p "$(dirname '${safeFilePath}')"`
+                    `mkdir -p "$(dirname '${fileOp.path}')"`
                 ];
                 
-                // Execute mkdir command
                 const mkdirResponse = await fetch(execUrl, {
                     method: 'POST',
                     headers: {
@@ -281,72 +334,158 @@ export const updateFileList = async (appName: string, files: Array<{path: string
                 
                 if (!mkdirResponse.ok) {
                     const errorText = await mkdirResponse.text();
-                    console.warn(`Warning creating directory for ${safeFilePath}: ${errorText}`);
-                    // Continue anyway as the directory might already exist
+                    console.warn(`Warning creating directory for ${fileOp.path}: ${errorText}`);
                 }
-                
-                // Compress the content using gzip
-                // const contentBuffer = Buffer.from(file.content, 'utf-8');
-                // const compressedContent = await gzipAsync(contentBuffer);
-                // const base64CompressedContent = compressedContent.toString('base64');
-                const contentBuffer = new TextEncoder().encode(file.content);
-                const compressedContent = await new Promise((resolve, reject) => {
-                  try {
-                    const data = gzip(contentBuffer);
-                    resolve(data);
-                  } catch (err) {
-                    reject(err);
-                  }
-                });
-                const base64CompressedContent = arrayBufferToBase64(compressedContent);
-                
-                console.log('Compressed content length:', base64CompressedContent.length);
-
-                // Write compressed content to a temporary file, then decompress it to the target file
-                const writeFileCommand = [
-                    "sh", "-c",
-                    `echo '${base64CompressedContent}' | base64 -d | gunzip > '${safeFilePath}'`
-                ];
-                
-                // Execute write file command
-                const writeResponse = await fetch(execUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${flyToken}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        command: writeFileCommand,
-                        timeout: 60
-                    }),
-                });
-                
-                if (!writeResponse.ok) {
-                    const errorText = await writeResponse.text();
-                    throw new Error(`Failed to write file ${safeFilePath}: ${writeResponse.status} - ${errorText}`);
-                }
-                
-                const result = await writeResponse.json();
-                results.push(result);
-                
-                // Add a small delay between requests to avoid rate limiting
-                await new Promise(resolve => setTimeout(resolve, 500));
             }
+            
+            // 批量写入文件
+            // 创建临时脚本文件来处理所有文件写入
+            const timestamp = Date.now();
+            const randomId = Math.random().toString(36).substring(2, 10);
+            const scriptPath = `/tmp/write_files_${timestamp}_${randomId}.sh`;
+            
+            // 构建脚本内容
+            let scriptContent = '#!/bin/sh\n\n';
+            
+            batchFileOps.forEach((fileOp, index) => {
+                const tempFile = `/tmp/temp_${timestamp}_${index}`;
+                scriptContent += `# Write file ${index+1}/${batchFileOps.length}: ${fileOp.path}\n`;
+                scriptContent += `echo '${fileOp.content}' | base64 -d > ${tempFile}\n`;
+                scriptContent += `gunzip -c ${tempFile} > '${fileOp.path}'\n`;
+                scriptContent += `rm ${tempFile}\n\n`;
+            });
+            
+            // 写入脚本文件
+            const writeScriptCommand = [
+                "sh", "-c",
+                `cat > ${scriptPath} << 'EOFSCRIPT'\n${scriptContent}\nEOFSCRIPT\nchmod +x ${scriptPath}`
+            ];
+            
+            const writeScriptResponse = await fetch(execUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${flyToken}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    command: writeScriptCommand,
+                    timeout: 60
+                }),
+            });
+            
+            if (!writeScriptResponse.ok) {
+                const errorText = await writeScriptResponse.text();
+                throw new Error(`Failed to create batch script: ${writeScriptResponse.status} - ${errorText}`);
+            }
+            
+            // 执行脚本
+            const executeScriptCommand = [
+                "sh", "-c",
+                `${scriptPath} && rm ${scriptPath}`
+            ];
+            
+            const executeResponse = await fetch(execUrl, {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${flyToken}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    command: executeScriptCommand,
+                    timeout: 120 // 给予更多时间执行批处理
+                }),
+            });
+            
+            if (!executeResponse.ok) {
+                const errorText = await executeResponse.text();
+                throw new Error(`Failed to execute batch script: ${executeResponse.status} - ${errorText}`);
+            }
+            
+            const result = await executeResponse.json();
+            
+            // 检查脚本执行结果
+            if (result.exit_code !== 0) {
+                console.error(`Batch script execution failed with code ${result.exit_code}`);
+                console.error(`STDOUT: ${result.stdout}`);
+                console.error(`STDERR: ${result.stderr}`);
+                throw new Error(`Batch script execution failed with code ${result.exit_code}`);
+            }
+            
+            return {
+                success: true,
+                batchSize: batch.length,
+                result: result
+            };
         } catch (error) {
-            console.error('Error updating file:', error);
-            throw error;
+            console.error('Error processing batch:', error);
+            return {
+                success: false,
+                batchSize: batch.length,
+                error: error.message
+            };
         }
     }
-
+    
+    // 并行处理所有批次，但控制并发数
+    async function processAllBatches() {
+        const batchResults = [];
+        const running = new Set();
+        const batchQueue = [...batches];
+        
+        async function runBatchTask(batch) {
+            const promise = processBatch(batch);
+            running.add(promise);
+            
+            try {
+                const result = await promise;
+                batchResults.push(result);
+            } catch (error) {
+                batchResults.push({
+                    success: false,
+                    batchSize: batch.length,
+                    error: error.message
+                });
+            } finally {
+                running.delete(promise);
+                // 处理队列中的下一个批次
+                if (batchQueue.length > 0) {
+                    const nextBatch = batchQueue.shift();
+                    runBatchTask(nextBatch);
+                }
+            }
+        }
+        
+        // 启动初始的并发批次
+        const initialBatchCount = Math.min(MAX_CONCURRENT_BATCHES, batchQueue.length);
+        for (let i = 0; i < initialBatchCount; i++) {
+            const batch = batchQueue.shift();
+            runBatchTask(batch);
+        }
+        
+        // 等待所有批次完成
+        while (running.size > 0) {
+            await Promise.race([...running]);
+        }
+        
+        return batchResults;
+    }
+    
+    // 处理所有批次并获取结果
+    const batchResults = await processAllBatches();
+    
+    // 组织返回结果
+    const allSuccessful = batchResults.every(result => result.success);
+    const totalProcessed = batchResults.reduce((sum, result) => sum + (result.batchSize || 0), 0);
+    
+    console.log(`Processed ${totalProcessed}/${files.length} files, success: ${allSuccessful}`);
+    
+    // 如果有package.json文件，重新安装依赖
     if (filePath.find((key: any) => key.includes('package.json'))) {
         const reinstallResult = await reinstallDependencies(appName);
         console.log('Reinstall dependencies result:', reinstallResult);
     }
     
-    // Log results for debugging but without exposing sensitive data
-    console.log(`File update results: ${results.length} operations completed`, results);
-    
-    return results.every((result: any) => result.exit_code === 0);
+    return allSuccessful;
 };
 
 
