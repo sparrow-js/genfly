@@ -53,6 +53,8 @@ export class WorkbenchStore {
   startStreaming: WritableAtom<boolean> = atom(false);
   tmpFiles: WritableAtom<{ path: string, content: string }[]> = atom([]);
 
+  genType: WritableAtom<string> = atom('');
+
   deploymentStatus: WritableAtom<'pending' | 'completed' | null> = atom(null);
 
   isFirstDeploy: WritableAtom<boolean> = atom(false);

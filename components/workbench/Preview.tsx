@@ -681,6 +681,7 @@ export const Preview = memo(({ sendMessage }: PreviewProps) => {
                   <button 
                     type="button"
                     onClick={() => {
+                      workbenchStore.genType.set('fix-error');
                       sendMessage?.({} as any, `*Fix this preview error* \n\`\`\`js \n${errorLogs.join('\n')}\n\`\`\`\n`);
                       setIsError(false);
                   }}

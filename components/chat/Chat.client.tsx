@@ -212,6 +212,11 @@ export const ChatImpl = memo(
 
             workbenchStore.uploadFilesTomachine(validFiles);
             workbenchStore.saveAllFiles();
+
+            if (workbenchStore.genType.get() === 'fix-error') {
+              workbenchStore.genType.set('');
+              workbenchStore.reloadPreview();
+            }
           }
         }, 1000);
       },
