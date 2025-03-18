@@ -5,6 +5,7 @@ import { workbenchStore } from '@/lib/stores/workbench';
 import { createScopedLogger } from '@/utils/logger';
 
 const logger = createScopedLogger('useMessageParser');
+const tmpPath = new Set();
 
 // 创建一个简单的节流函数
 function throttle<T extends (...args: any[]) => any>(
@@ -68,6 +69,11 @@ const messageParser = new StreamingMessageParser({
         workbenchStore.startStreaming.set(true);
         workbenchStore.resetGeneratedFiles();
       }
+
+      if (data.action.type === 'file') {
+        workbenchStore.setGeneratedFile(`/home/project/${data.action.filePath}`);
+      }
+
       logger.trace('onActionStream', data.action);
       
       // 使用节流版本的 runAction 减少频繁调用

@@ -661,7 +661,7 @@ export class WorkbenchStore {
       // 批量处理所有文件更新
       for (const [filePath, content] of updates.entries()) {
         this.#editorStore.updateFile(filePath, content);
-        this.#filesStore.setGeneratedFile(filePath);
+        // this.#filesStore.setGeneratedFile(filePath);
       }
     }, 50); // 50ms 批处理间隔
   }

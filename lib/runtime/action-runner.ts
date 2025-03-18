@@ -312,7 +312,7 @@ export class ActionRunner {
               content: action.content, 
               isBinary: false 
             });
-            workbenchStore.setGeneratedFile(`/home/project/${action.filePath}`);
+            // workbenchStore.setGeneratedFile(`/home/project/${action.filePath}`);
             resolve();
           });
         });
@@ -322,7 +322,7 @@ export class ActionRunner {
           content: action.content, 
           isBinary: false 
         });
-        workbenchStore.setGeneratedFile(`/home/project/${action.filePath}`);
+        // workbenchStore.setGeneratedFile(`/home/project/${action.filePath}`);
       }
       
       logger.debug(`File written /home/project/${action.filePath}`);

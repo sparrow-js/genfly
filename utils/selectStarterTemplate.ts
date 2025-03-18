@@ -81,7 +81,6 @@ export const selectStarterTemplate = async (options: { message: string; model: s
     body: JSON.stringify(requestBody),
   });
   const respJson: { text: string } = await response.json();
-  console.log(respJson);
 
   const { text } = respJson;
   const selectedTemplate = parseSelectedTemplate(text);

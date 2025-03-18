@@ -198,6 +198,8 @@ export const ChatImpl = memo(
           if (uploadedFiles.length > 0) {
             const validFiles = uploadedFiles
               .map((file: any) => {
+                workbenchStore.saveFile(file);
+
                 const fileContent = workbenchStore.files.get()[file];
                 return fileContent?.type === 'file' ? { 
                   path: file.replace('/home/project', '/app'), 
