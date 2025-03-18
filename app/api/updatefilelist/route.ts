@@ -18,11 +18,11 @@ export async function POST(request: Request) {
     //   });
     // }
     
-    await updateFileList(appName, files);
+    const res = await updateFileList(appName, files);
 
     return NextResponse.json({
       success: true,
-      message: 'Application updated successfully',
+      result: res,
       data: {},
     });
   } catch (error) {

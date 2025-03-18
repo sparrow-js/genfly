@@ -434,13 +434,14 @@ export const updateFileList = async (appName: string, files: Array<{path: string
         for (let i = 0; i < batches.length; i++) {
             console.log(`Processing batch ${i+1}/${batches.length}`);
             try {
+                console.log(`Processing ********** time: ${new Date().toISOString()}`);
                 const result = await processBatch(batches[i]);
                 batchResults.push(result);
                 
                 // 在批次之间添加延迟，避免API限制
                 if (i < batches.length - 1) {
                     console.log(`Adding delay between batches (2 second)`);
-                    await new Promise(resolve => setTimeout(resolve, 2000));
+                    await new Promise(resolve => setTimeout(resolve, 3000));
                 }
             } catch (error) {
                 console.error(`Error processing batch ${i+1}:`, error);
