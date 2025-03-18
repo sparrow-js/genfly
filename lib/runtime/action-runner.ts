@@ -134,14 +134,14 @@ export class ActionRunner {
       this.#currentExecutionPromise = this.#currentExecutionPromise
         .then(() => {
           return new Promise<void>((resolve) => {
-            requestAnimationFrame(() => {
+            setTimeout(() => {
               this.#executeAction(actionId, isStreaming)
                 .then(resolve)
                 .catch((error) => {
                   console.error('Action failed:', error);
                   resolve();
                 });
-            });
+            }, 0);
           });
         });
     } else {
