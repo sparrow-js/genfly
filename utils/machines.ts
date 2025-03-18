@@ -244,7 +244,6 @@ export const updateFileList = async (appName: string, files: Array<{path: string
     // 创建基于文件大小的批次
     const MAX_BATCH_SIZE_KB = 20; // 最大批次大小，单位KB
     const MAX_BATCH_SIZE = MAX_BATCH_SIZE_KB * 1024; // 转换为字节
-    const MAX_CONCURRENT_BATCHES = 5; // 最大并发批次数
     
     // 根据文件大小分组
     const batches: Array<Array<{path: string, content: string}>> = [];
@@ -283,7 +282,7 @@ export const updateFileList = async (appName: string, files: Array<{path: string
     
     console.log(`Created ${batches.length} batches from ${files.length} files`, batches);
     
-    // 处理所有批次，允许并行
+    // 处理所有批次，使用串行处理以避免频率限制
     const results = [];
     
     // 处理单个批次的函数
@@ -426,52 +425,38 @@ export const updateFileList = async (appName: string, files: Array<{path: string
         }
     }
     
-    // 并行处理所有批次，但控制并发数
-    async function processAllBatches() {
-        const batchResults: any[] = [];
-        const running = new Set();
-        const batchQueue = [...batches];
+    // 串行处理所有批次以避免触发频率限制
+    async function processAllBatchesSerially() {
+        const batchResults = [];
         
-        async function runBatchTask(batch: any) {
-            const promise = processBatch(batch);
-            running.add(promise);
-            
+        console.log(`Starting serial processing of ${batches.length} batches`);
+        
+        for (let i = 0; i < batches.length; i++) {
+            console.log(`Processing batch ${i+1}/${batches.length}`);
             try {
-                const result = await promise;
+                const result = await processBatch(batches[i]);
                 batchResults.push(result);
+                
+                // 在批次之间添加延迟，避免API限制
+                if (i < batches.length - 1) {
+                    console.log(`Adding delay between batches (1 second)`);
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                }
             } catch (error) {
+                console.error(`Error processing batch ${i+1}:`, error);
                 batchResults.push({
                     success: false,
-                    batchSize: batch.length,
+                    batchSize: batches[i].length,
                     error: error
                 });
-            } finally {
-                running.delete(promise);
-                // 处理队列中的下一个批次
-                if (batchQueue.length > 0) {
-                    const nextBatch = batchQueue.shift();
-                    runBatchTask(nextBatch);
-                }
             }
-        }
-        
-        // 启动初始的并发批次
-        const initialBatchCount = Math.min(MAX_CONCURRENT_BATCHES, batchQueue.length);
-        for (let i = 0; i < initialBatchCount; i++) {
-            const batch = batchQueue.shift();
-            runBatchTask(batch);
-        }
-        
-        // 等待所有批次完成
-        while (running.size > 0) {
-            await Promise.race([...running]);
         }
         
         return batchResults;
     }
     
     // 处理所有批次并获取结果
-    const batchResults = await processAllBatches();
+    const batchResults = await processAllBatchesSerially();
     
     // 组织返回结果
     const allSuccessful = batchResults.every(result => result.success);
