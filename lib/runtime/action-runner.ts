@@ -306,7 +306,7 @@ export class ActionRunner {
       // 使用 requestAnimationFrame 延迟文件写入，避免阻塞主线程
       if (typeof window !== 'undefined' && 'requestAnimationFrame' in window) {
         await new Promise<void>((resolve) => {
-          window.requestAnimationFrame(() => {
+          setTimeout(() => {
             workbenchStore.files.setKey(`/home/project/${action.filePath}`, { 
               type: 'file', 
               content: action.content, 
@@ -314,7 +314,7 @@ export class ActionRunner {
             });
             // workbenchStore.setGeneratedFile(`/home/project/${action.filePath}`);
             resolve();
-          });
+          }, 0);
         });
       } else {
         workbenchStore.files.setKey(`/home/project/${action.filePath}`, { 
@@ -322,7 +322,6 @@ export class ActionRunner {
           content: action.content, 
           isBinary: false 
         });
-        // workbenchStore.setGeneratedFile(`/home/project/${action.filePath}`);
       }
       
       logger.debug(`File written /home/project/${action.filePath}`);
