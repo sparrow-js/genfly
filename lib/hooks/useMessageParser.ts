@@ -71,7 +71,6 @@ const messageParser = new StreamingMessageParser({
       }
 
       if (data.action.type === 'file') {
-        console.log('onActionStream **********', data.action.filePath);
         workbenchStore.setGeneratedFile(`/home/project/${data.action.filePath}`);
       }
 
