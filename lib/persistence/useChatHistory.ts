@@ -156,7 +156,6 @@ export function useChatHistory() {
           chatId.set(newId);
           const appName = `app-${newId}`;
           appId.set(appName);
-          workbenchStore.resetGeneratedFiles();
           workbenchStore.setDeploymentStatus('pending');
           
           await fetch('/api/deploy', {

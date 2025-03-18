@@ -212,7 +212,6 @@ export const ChatImpl = memo(
 
             workbenchStore.uploadFilesTomachine(validFiles);
             workbenchStore.saveAllFiles();
-            workbenchStore.resetGeneratedFiles();
           }
         }, 1000);
       },
@@ -321,7 +320,6 @@ export const ChatImpl = memo(
       }
 
       runAnimation();
-      workbenchStore.resetGeneratedFiles();
       workbenchStore.startStreaming.set(false);
       workbenchStore.hasSendLLM.set(true);
 
