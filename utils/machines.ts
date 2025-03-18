@@ -421,18 +421,18 @@ export const updateFileList = async (appName: string, files: Array<{path: string
             return {
                 success: false,
                 batchSize: batch.length,
-                error: error.message
+                error: error
             };
         }
     }
     
     // 并行处理所有批次，但控制并发数
     async function processAllBatches() {
-        const batchResults = [];
+        const batchResults: any[] = [];
         const running = new Set();
         const batchQueue = [...batches];
         
-        async function runBatchTask(batch) {
+        async function runBatchTask(batch: any) {
             const promise = processBatch(batch);
             running.add(promise);
             
@@ -443,7 +443,7 @@ export const updateFileList = async (appName: string, files: Array<{path: string
                 batchResults.push({
                     success: false,
                     batchSize: batch.length,
-                    error: error.message
+                    error: error
                 });
             } finally {
                 running.delete(promise);
