@@ -280,7 +280,7 @@ export const updateFileList = async (appName: string, files: Array<{path: string
         batches.push(currentBatch);
     }
     
-    console.log(`Created ${batches.length} batches from ${files.length} files`, batches);
+    console.log(`Created ${batches.length} batches from ${files.length} files`);
     
     // 处理所有批次，使用串行处理以避免频率限制
     const results = [];
