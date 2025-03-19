@@ -239,7 +239,7 @@ export const updateFileList = async (
     appName: string, 
     files: Array<{path: string, content: string}>, 
     installDependencies: string,
-    callback: (result: any) => void
+    callback: (result: any) => Promise<void>
 ) => {
     const machine = await ensureMachineReady(appName);
 
@@ -252,7 +252,7 @@ export const updateFileList = async (
     if (!hasPackageJson && installDependencies) {
         const reinstallResult = await reinstallDependencies(appName, installDependencies, hasPackageJson, machine);
         console.log('Reinstall dependencies result:', reinstallResult);
-        callback({
+        await callback({
             event: 'install',
             result: reinstallResult,
         });
@@ -396,7 +396,7 @@ export const updateFileList = async (
             }
             
             const result = await executeResponse.json();
-            callback({
+            await callback({
                 event: 'updatefile',
                 result: result,
             });
@@ -467,7 +467,7 @@ export const updateFileList = async (
     if (hasPackageJson) {
         const reinstallResult = await reinstallDependencies(appName, installDependencies, hasPackageJson, machine);
         console.log('Reinstall dependencies result:', reinstallResult);
-        callback({
+        await callback({
             event: 'packageInstall',
             result: reinstallResult,
         });

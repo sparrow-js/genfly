@@ -21,8 +21,8 @@ export async function POST(request: Request) {
     const responseStream = new TransformStream();
     const writer = responseStream.writable.getWriter();
 
-    function noticeHost(data: any) {
-      writer.write(
+    async function noticeHost(data: any) {
+      await writer.write(
         `data: ${JSON.stringify({
           event: 'message',
           data: data,
@@ -30,8 +30,8 @@ export async function POST(request: Request) {
       );
     }
 
-    setTimeout(() => {
-      noticeHost({
+    setTimeout(async () => {
+      await noticeHost({
         event: 'start',
         message: 'Updating file list...',
       });
@@ -42,15 +42,15 @@ export async function POST(request: Request) {
       appName,
       files,
       installDependencies, 
-      (result: any) => {
-        noticeHost(result);
+      async (result: any) => {
+        await noticeHost(result);
       })
     .then(async(result) => {
-      noticeHost({
+      await noticeHost({
         event: 'complete',
         result: result,
       });
-      
+
       await writer.close();
     })
     
