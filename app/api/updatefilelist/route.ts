@@ -36,7 +36,6 @@ export async function POST(request: Request) {
         message: 'Updating file list...',
       });
     }, 10);
-
     
 
     updateFileList(
@@ -46,15 +45,14 @@ export async function POST(request: Request) {
       (result: any) => {
         noticeHost(result);
       })
-    .then((result) => {
+    .then(async(result) => {
       noticeHost({
         event: 'complete',
         result: result,
       });
-    })
-    .finally(async () => {
+      
       await writer.close();
-    });
+    })
     
 
     return new Response(responseStream.readable, {
