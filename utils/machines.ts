@@ -235,7 +235,12 @@ export const getMachine = async (appName: string) => {
 };
 
 
-export const updateFileList = async (appName: string, files: Array<{path: string, content: string}>, installDependencies: string) => {
+export const updateFileList = async (
+    appName: string, 
+    files: Array<{path: string, content: string}>, 
+    installDependencies: string,
+    callback: (result: any) => void
+) => {
     const machine = await ensureMachineReady(appName);
 
     const execUrl = `https://api.machines.dev/v1/apps/${appName}/machines/${machine.id}/exec`;
@@ -247,6 +252,10 @@ export const updateFileList = async (appName: string, files: Array<{path: string
     if (!hasPackageJson && installDependencies) {
         const reinstallResult = await reinstallDependencies(appName, installDependencies, hasPackageJson, machine);
         console.log('Reinstall dependencies result:', reinstallResult);
+        callback({
+            event: 'install',
+            result: reinstallResult,
+        });
     }
     
     // 创建基于文件大小的批次
@@ -409,6 +418,10 @@ export const updateFileList = async (appName: string, files: Array<{path: string
             }
             
             const result = await executeResponse.json();
+            callback({
+                event: 'updatefile',
+                result: result,
+            });
             
             // 检查脚本执行结果
             if (result.exit_code !== 0) {
@@ -476,6 +489,10 @@ export const updateFileList = async (appName: string, files: Array<{path: string
     if (hasPackageJson) {
         const reinstallResult = await reinstallDependencies(appName, installDependencies, hasPackageJson, machine);
         console.log('Reinstall dependencies result:', reinstallResult);
+        callback({
+            event: 'packageInstall',
+            result: reinstallResult,
+        });
     }
     
     

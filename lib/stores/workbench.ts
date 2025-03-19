@@ -601,9 +601,8 @@ export class WorkbenchStore {
             installDependencies: installDependencies,
           }),
         });
-        
 
-        if (!response.ok) {
+        if (!response.ok || !response.body) {
           this.tmpFiles.set(files);
           this.actionAlert.set({
             type: 'machine',
@@ -612,20 +611,50 @@ export class WorkbenchStore {
             content: "Error occurred at upload Files To Machine",
             source: 'preview',
           });
+          return;
         }
 
-        workbenchStore.installDependencies.set('');
 
-        workbenchStore.previews.set([{
-          port: 3000,
-          ready: true,
-          baseUrl: `https://${appId.get()}.fly.dev/`,
-          isLoading: true,
-          loadingProgress: 0
-        }]);
-        
-        this.setIsFirstDeploy(false);
-       
+        const handleStream = (result: any) => {
+          if (result.event === 'complete') {
+            workbenchStore.installDependencies.set('');
+
+            workbenchStore.previews.set([{
+              port: 3000,
+              ready: true,
+              baseUrl: `https://${appId.get()}.fly.dev/`,
+              isLoading: true,
+              loadingProgress: 0
+            }]);
+            
+            this.setIsFirstDeploy(false);
+          }
+          
+        }
+
+        // Handle streaming response
+        const reader = response.body.getReader();
+        const decoder = new TextDecoder();
+
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          const text = decoder.decode(value, { stream: true });
+          try {
+            const lines = text.split("\n");
+            console.log('data: ', text);
+            for (const line of lines) {
+              if (line.startsWith('data:')) {
+                const data = JSON.parse(line.substring(6)) as Record<string, any>; // remove data: and parse as json
+                handleStream(data?.data);
+              }
+            }
+          } catch (e) {
+            console.warn('Error parsing stream data:', e);
+          }         
+        }
+
         // this.reloadPreview();
 
     } catch (error) {

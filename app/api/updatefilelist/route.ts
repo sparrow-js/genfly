@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { updateFileList } from '@/utils/machines';
 import { auth } from 'auth';
+export const maxDuration = 300;
 
 export const runtime = 'edge';
 export async function POST(request: Request) {
@@ -17,13 +18,43 @@ export async function POST(request: Request) {
         headers: { 'Content-Type': 'text/plain' },
       });
     }
-    
-    const res = await updateFileList(appName, files, installDependencies);
 
-    return NextResponse.json({
-      success: true,
-      result: res,
-      data: {},
+    const responseStream = new TransformStream();
+    const writer = responseStream.writable.getWriter();
+
+    function noticeHost(data: any) {
+      writer.write(
+        `data: ${JSON.stringify({
+          event: 'message',
+          data: data,
+        })} \n\n`,
+      );
+    }
+    
+
+    updateFileList(
+      appName,
+      files,
+      installDependencies, 
+      (result: any) => {
+        noticeHost(result);
+      })
+    .then((result) => {
+      noticeHost({
+        event: 'complete',
+        result: result,
+      });
+    })
+    .finally(() => {
+      writer.close();
+    });
+
+    return new Response(responseStream.readable, {
+      headers: {
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
+      },
     });
   } catch (error) {
     console.error('Error creating application:', error);
