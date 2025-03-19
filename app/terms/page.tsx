@@ -18,7 +18,7 @@ export default function TermsPage() {
         <ul>
           <li>Acknowledge that you have read and understood these Terms</li>
           <li>Agree to be bound by these Terms</li>
-          <li>Agree to our Privacy Policy (genfly.dev/privacy)</li>
+          <li>Agree to our Privacy Policy (genfly.dev/privacy-policy)</li>
           <li>Commit to comply with all applicable laws and regulations</li>
         </ul>
 
@@ -215,7 +215,7 @@ export default function TermsPage() {
 
         <p>
           For complete details about data collection, processing, and your privacy
-          rights, please refer to our Privacy policy at genfly.dev/privacy.
+          rights, please refer to our Privacy policy at genfly.dev/privacy-policy.
         </p>
 
         <h2>User accounts and content</h2>
@@ -256,7 +256,7 @@ export default function TermsPage() {
         <h3>Support services</h3>
         <ul>
           <li>Available only to Scale and Enterprise plan subscribers</li>
-          <li>Contact via support@genfly.dev</li>
+          <li>Contact via genflyai@gmail.com</li>
           <li>Limited to platform-related issues</li>
           <li>Does not include application debugging services</li>
           <li>Subject to our capacity and availability</li>
@@ -278,7 +278,7 @@ export default function TermsPage() {
           </li>
           <li>You will receive login credentials via email</li>
           <li>
-            If you experience any issues with access, contact support@genfly.dev
+            If you experience any issues with access, contact genflyai@gmail.com
           </li>
         </ul>
 
@@ -340,7 +340,7 @@ export default function TermsPage() {
         <p>
           We respect intellectual property rights and comply with the Digital
           Millennium Copyright Act (DMCA). For any DMCA-related issues, contact us
-          at feedback@genfly.dev with:
+          at genflyai@gmail.com with:
         </p>
         <ul>
           <li>Identification of the copyrighted work claimed to be infringed</li>
@@ -565,7 +565,7 @@ export default function TermsPage() {
 
         <h2>Contact information</h2>
         <p>For any questions regarding these Terms, contact us at:</p>
-        <p>Email: feedback@genfly.dev</p>
+        <p>Email: genflyai@gmail.com</p>
       </section>
     </main>
   );

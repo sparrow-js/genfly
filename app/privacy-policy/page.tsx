@@ -142,7 +142,7 @@ export default function PrivacyPolicy() {
           <li>Opt out of certain processing</li>
           <li>Withdraw consent</li>
         </ul>
-        <p>Contact feedback@genfly.dev to exercise these rights.</p>
+        <p>Contact genflyai@gmail.com to exercise these rights.</p>
 
         <h2>Security Measures</h2>
         <p>We implement industry-standard security measures:</p>
@@ -227,11 +227,11 @@ export default function PrivacyPolicy() {
 
         <h3>Contact Us For</h3>
         <ul>
-          <li>Privacy questions: feedback@genfly.dev</li>
-          <li>Support (Enterprise & Scale plans): support@genfly.dev</li>
-          <li>DMCA and legal issues: feedback@genfly.dev</li>
-          <li>General feedback: feedback@genfly.dev</li>
-          <li>Job applications: careers@genfly.dev</li>
+          <li>Privacy questions: genflyai@gmail.com</li>
+          <li>Support (Enterprise & Scale plans): genflyai@gmail.com</li>
+          <li>DMCA and legal issues: genflyai@gmail.com</li>
+          <li>General feedback: genflyai@gmail.com</li>
+          <li>Job applications: genflyai@gmail.com</li>
         </ul>
 
         <h3>Response Times</h3>
