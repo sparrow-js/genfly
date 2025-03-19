@@ -641,7 +641,7 @@ export class WorkbenchStore {
           if (done) break;
 
           const text = decoder.decode(value, { stream: true });
-          console.log('************** data: ', text);
+          console.log('deploy data: ', text);
           try {
             const lines = text.split("\n");
             for (const line of lines) {
