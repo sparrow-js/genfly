@@ -593,7 +593,7 @@ export class WorkbenchStore {
 
     try {
         this.currentView.set('preview');
-        const response = await fetch('/api/updatefilelist', {
+        const response = await fetch('/api/deploy-to-machine', {
           method: 'POST',
           body: JSON.stringify({
             appName: appId.get(),
