@@ -629,7 +629,17 @@ export class WorkbenchStore {
             
             this.setIsFirstDeploy(false);
           }
-          
+
+          if (result.event === 'error') {
+            this.tmpFiles.set(files);
+            this.actionAlert.set({
+              type: 'machine',
+              title: 'Error uploading files to machine',
+              description: 'Error occurred at upload Files To Machine',
+              content: "Error occurred at upload Files To Machine",
+              source: 'preview',
+            });
+          }
         }
 
         // Handle streaming response

@@ -258,7 +258,7 @@ export const updateFileList = async (
     }
     
     // 创建基于文件大小的批次
-    const MAX_BATCH_SIZE_KB = 15; // 最大批次大小，单位KB
+    const MAX_BATCH_SIZE_KB = 30; // 最大批次大小，单位KB
     const MAX_BATCH_SIZE = MAX_BATCH_SIZE_KB * 1024; // 转换为字节
     
     // 根据文件大小分组
@@ -415,6 +415,10 @@ export const updateFileList = async (
             };
         } catch (error) {
             console.error('Error processing batch:', error);
+            await callback({
+                event: 'error',
+                result: error,
+            });
             return {
                 success: false,
                 batchSize: batch.length,
