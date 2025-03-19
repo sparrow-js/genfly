@@ -258,7 +258,7 @@ export const updateFileList = async (
     }
     
     // 创建基于文件大小的批次
-    const MAX_BATCH_SIZE_KB = 30; // 最大批次大小，单位KB
+    const MAX_BATCH_SIZE_KB = 20; // 最大批次大小，单位KB
     const MAX_BATCH_SIZE = MAX_BATCH_SIZE_KB * 1024; // 转换为字节
     
     // 根据文件大小分组
@@ -328,33 +328,7 @@ export const updateFileList = async (
                 };
             }));
             
-            // 为每个文件创建目录
-            for (const fileOp of batchFileOps) {
-                const mkdirCommand = [
-                    "sh", "-c",
-                    `mkdir -p "$(dirname '${fileOp.path}')"`
-                ];
-                
-                const mkdirResponse = await fetch(execUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${flyToken}`,
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        command: mkdirCommand,
-                        timeout: 30
-                    }),
-                });
-                
-                if (!mkdirResponse.ok) {
-                    const errorText = await mkdirResponse.text();
-                    console.warn(`Warning creating directory for ${fileOp.path}: ${errorText}`);
-                }
-            }
-            
             // 批量写入文件
-            // 创建临时脚本文件来处理所有文件写入
             const timestamp = Date.now();
             const randomId = Math.random().toString(36).substring(2, 10);
             const scriptPath = `/tmp/write_files_${timestamp}_${randomId}.sh`;
@@ -365,8 +339,9 @@ export const updateFileList = async (
             batchFileOps.forEach((fileOp, index) => {
                 const tempFile = `/tmp/temp_${timestamp}_${index}`;
                 scriptContent += `# Write file ${index+1}/${batchFileOps.length}: ${fileOp.path}\n`;
-                scriptContent += `echo '${fileOp.content}' | base64 -d > ${tempFile}\n`;
-                scriptContent += `gunzip -c ${tempFile} > '${fileOp.path}'\n`;
+                scriptContent += `mkdir -p "$(dirname '${fileOp.path}')" && \\\n`; // 在写入文件前创建目录
+                scriptContent += `echo '${fileOp.content}' | base64 -d > ${tempFile} && \\\n`;
+                scriptContent += `gunzip -c ${tempFile} > '${fileOp.path}' && \\\n`;
                 scriptContent += `rm ${tempFile}\n\n`;
             });
             
