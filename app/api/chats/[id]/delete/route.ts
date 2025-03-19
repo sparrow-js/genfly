@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from '@/db';
 import { chats } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import { auth } from "auth";
 export async function POST(
   request: Request,
@@ -11,7 +11,7 @@ export async function POST(
     const { id: chatId } = await params;
 
     const session = await auth();
-    if (!session) {
+    if (!session?.user?.id) {
       return new Response('Unauthorized', {
         status: 401,
         headers: { 'Content-Type': 'text/plain' },
@@ -19,7 +19,12 @@ export async function POST(
     }
     const existingChat = await db.select()
     .from(chats)
-    .where(eq(chats.id, chatId))
+    .where(
+      and(
+        eq(chats.id, chatId),
+        eq(chats.userId, session.user.id)
+      )
+    )
     .limit(1);
 
   if (!existingChat || existingChat.length === 0) {
@@ -28,7 +33,12 @@ export async function POST(
 
   // Delete the chat
   const deletedChat = await db.delete(chats)
-    .where(eq(chats.id, chatId))
+    .where(
+      and(
+        eq(chats.id, chatId),
+        eq(chats.userId, session.user.id)
+      )
+    )
     .returning();
 
   if (!deletedChat || deletedChat.length === 0) {

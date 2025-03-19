@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db, withDb } from '@/db';
 import { chats } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, and } from "drizzle-orm";
 import type { ChatHistoryItem } from "@/lib/persistence/types";
 import { auth } from "auth";
 
@@ -11,12 +11,14 @@ export async function POST(
 ) {
 
   const session = await auth();
-  if (!session) {
+  if (!session?.user?.id) {
     return new Response('Unauthorized', {
       status: 401,
       headers: { 'Content-Type': 'text/plain' },
     });
   }
+
+  const userId = session.user.id;
 
   try {
     const body = await request.json();
@@ -49,7 +51,12 @@ export async function POST(
       // 首先检查聊天是否存在
       const existingChat = await db.select()
         .from(chats)
-        .where(eq(chats.id, chatId))
+        .where(
+          and(
+            eq(chats.id, chatId),
+            eq(chats.userId, userId)
+          )
+        )
         .limit(1);
       
       if (!existingChat || existingChat.length === 0) {
@@ -59,7 +66,12 @@ export async function POST(
       // 更新数据库中的聊天描述
       const updatedChat = await db.update(chats)
         .set({ description: trimmedDesc })
-        .where(eq(chats.id, chatId))
+        .where(
+          and(
+            eq(chats.id, chatId),
+            eq(chats.userId, userId)
+          )
+        )
         .returning();
       
       if (!updatedChat || updatedChat.length === 0) {

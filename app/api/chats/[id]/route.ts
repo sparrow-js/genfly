@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@/db';
 import { chats } from '@/db/schema';
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
 import { auth } from 'auth';
 const isUUID = (str: string) => {
   const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -25,6 +25,10 @@ export async function GET(
       });
     }
 
+    if (!session?.user?.id) {
+      return new Response('Unauthorized', { status: 401 });
+    }
+
     if (!id) {
       return NextResponse.json({ error: 'Chat ID is required' }, { status: 400 });
     }
@@ -32,7 +36,12 @@ export async function GET(
     const chat = await db
       .select()
       .from(chats)
-      .where(isUUID(id) ? eq(chats.id, id) : eq(chats.urlId, id))
+      .where(
+        and(
+          isUUID(id) ? eq(chats.id, id) : eq(chats.urlId, id),
+          eq(chats.userId, session.user.id)
+        )
+      )
       .limit(1)
 
     if (!chat.length) {

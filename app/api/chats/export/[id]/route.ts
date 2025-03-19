@@ -2,7 +2,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { withDb } from '@/db'; // Adjusted import path
 import { chats } from '@/db/schema'; // Adjusted import path
-import { eq } from 'drizzle-orm';
+import { eq, and } from 'drizzle-orm';
+import { auth } from "auth";
 
 const isUUID = (str: string) => {
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -13,7 +14,16 @@ const isUUID = (str: string) => {
 export async function GET(request: NextRequest,
      { params }: { params: Promise<{ id: string }> } // 类型定义
 ) {
-  const { id } = await params; // 从 params 中获取 id
+  const session = await auth();
+  if (!session?.user?.id) {
+    return new Response('Unauthorized', {
+      status: 401,
+      headers: { 'Content-Type': 'text/plain' },
+    });
+  }
+
+  const userId = session.user.id;
+  const { id } = await params;
 
   if (!id) {
     return NextResponse.json({ error: 'ID is required' }, { status: 400 });
@@ -23,7 +33,12 @@ export async function GET(request: NextRequest,
     db
       .select()
       .from(chats)
-      .where(isUUID(id) ? eq(chats.id, id) : eq(chats.urlId, id))
+      .where(
+        and(
+          isUUID(id) ? eq(chats.id, id) : eq(chats.urlId, id),
+          eq(chats.userId, userId)
+        )
+      )
       .limit(1)
   );
 
