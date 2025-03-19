@@ -51,7 +51,7 @@ export async function POST(request: Request) {
         result: result,
       });
 
-      await writer.close();
+      // await writer.close();
     })
     
 
