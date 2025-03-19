@@ -439,7 +439,7 @@ export const updateFileList = async (
                 // 在批次之间添加延迟，避免API限制
                 if (i < batches.length - 1) {
                     console.log(`Adding delay between batches (2 second)`);
-                    await new Promise(resolve => setTimeout(resolve, 4000));
+                    await new Promise(resolve => setTimeout(resolve, 2000));
                 }
             } catch (error) {
                 console.error(`Error processing batch ${i+1}:`, error);
