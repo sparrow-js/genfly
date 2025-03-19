@@ -72,7 +72,7 @@ export default function ChatAlert({ alert, clearAlert, postMessage }: Props) {
                 <button
                   onClick={() => {
                     if (type === 'machine') {
-                      workbenchStore.uploadFilesTomachine(workbenchStore.tmpFiles.get());
+                      workbenchStore.uploadFilesTomachine(workbenchStore.tmpFiles.get(), workbenchStore.installDependencies.get());
                       clearAlert();
                     } else {
                       postMessage(
