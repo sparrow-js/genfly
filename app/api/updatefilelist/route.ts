@@ -55,7 +55,15 @@ export async function POST(request: Request) {
     });
     
 
-    return new Response(responseStream.readable);
+    return new Response(responseStream.readable, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/event-stream; charset=utf-8',
+        'Connection': 'keep-alive',
+        'Cache-Control': 'no-cache',
+        'Transfer-Encoding': 'chunked',
+      },
+    });
   } catch (error) {
     console.error('Error creating application:', error);
     return NextResponse.json(
