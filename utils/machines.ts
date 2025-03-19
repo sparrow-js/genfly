@@ -371,33 +371,11 @@ export const updateFileList = async (
                 scriptContent += `rm ${tempFile}\n\n`;
             });
             
-            // 写入脚本文件
-            const writeScriptCommand = [
+            // 合并写入和执行脚本的命令
+            const combinedCommand = [
                 "sh", "-c",
-                `cat > ${scriptPath} << 'EOFSCRIPT'\n${scriptContent}\nEOFSCRIPT\nchmod +x ${scriptPath}`
-            ];
-            
-            const writeScriptResponse = await fetch(execUrl, {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${flyToken}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    command: writeScriptCommand,
-                    timeout: 60
-                }),
-            });
-            
-            if (!writeScriptResponse.ok) {
-                const errorText = await writeScriptResponse.text();
-                throw new Error(`Failed to create batch script: ${writeScriptResponse.status} - ${errorText}`);
-            }
-            
-            // 执行脚本
-            const executeScriptCommand = [
-                "sh", "-c",
-                `${scriptPath} && rm ${scriptPath}`
+                `cat > ${scriptPath} << 'EOFSCRIPT'\n${scriptContent}\nEOFSCRIPT\n` +
+                `chmod +x ${scriptPath} && ${scriptPath} && rm ${scriptPath}`
             ];
             
             const executeResponse = await fetch(execUrl, {
@@ -407,8 +385,8 @@ export const updateFileList = async (
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    command: executeScriptCommand,
-                    timeout: 120 // 给予更多时间执行批处理
+                    command: combinedCommand,
+                    timeout: 120 // 给予足够时间完成所有操作
                 }),
             });
             

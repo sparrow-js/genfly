@@ -35,7 +35,7 @@ export async function POST(request: Request) {
         event: 'start',
         message: 'Updating file list...',
       });
-    }, 1000);
+    }, 10);
 
     
 
