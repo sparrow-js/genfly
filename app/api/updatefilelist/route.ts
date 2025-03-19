@@ -31,10 +31,13 @@ export async function POST(request: Request) {
       );
     }
 
-    noticeHost({
-      event: 'start',
-      message: 'Updating file list...',
-    });
+    setTimeout(() => {
+      noticeHost({
+        event: 'start',
+        message: 'Updating file list...',
+      });
+    }, 1000);
+
     
 
     updateFileList(
