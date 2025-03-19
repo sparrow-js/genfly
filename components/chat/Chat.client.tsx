@@ -382,6 +382,7 @@ export const ChatImpl = memo(
               ]);
               reload();
               setFakeLoading(false);
+              setImageDataList([]);
 
               return;
             }
@@ -407,6 +408,7 @@ export const ChatImpl = memo(
         ]);
         reload();
         setFakeLoading(false);
+        setImageDataList([]);
 
         return;
       }
