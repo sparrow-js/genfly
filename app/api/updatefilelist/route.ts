@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { updateFileList } from '@/utils/machines';
 import { auth } from 'auth';
 
+
 export const runtime = 'edge';
 
 export async function POST(request: Request) {
@@ -19,53 +20,59 @@ export async function POST(request: Request) {
       });
     }
 
-    const responseStream = new TransformStream();
-    const writer = responseStream.writable.getWriter();
+    // 创建一个新的 ReadableStream
+    const stream = new ReadableStream({
+      async start(controller) {
+        const encoder = new TextEncoder();
 
-    async function noticeHost(data: any) {
-      await writer.write(
-        `data: ${JSON.stringify({
-          event: 'message',
-          data: data,
-        })} \n\n`,
-      );
-    }
+        async function noticeHost(data: any) {
+          const message = `data: ${JSON.stringify({
+            event: 'message',
+            data: data,
+          })}\n\n`;
+          controller.enqueue(encoder.encode(message));
+        }
 
-    setTimeout(async () => {
-      await noticeHost({
-        event: 'start',
-        message: 'Updating file list...',
-      });
-    }, 10);
-    
+        // 发送开始消息
+        await noticeHost({
+          event: 'start',
+          message: 'Updating file list...',
+        });
 
-    updateFileList(
-      appName,
-      files,
-      installDependencies, 
-      async (result: any) => {
-        await noticeHost(result);
-      })
-    .then(async(result) => {
-      console.log('result ***************6666');
-      await noticeHost({
-        event: 'complete',
-        result: result,
-      });
+        try {
+          await updateFileList(
+            appName,
+            files,
+            installDependencies,
+            async (result: any) => {
+              await noticeHost(result);
+            }
+          );
 
-      // await writer.close();
-    })
-    
+          // 发送完成消息
+          await noticeHost({
+            event: 'complete',
+            result: 'Update completed',
+          });
+        } catch (error) {
+          await noticeHost({
+            event: 'error',
+            error: error instanceof Error ? error.message : 'Unknown error occurred',
+          });
+        } finally {
+          controller.close();
+        }
+      }
+    });
 
-    return new Response(responseStream.readable, {
-      status: 200,
+    return new Response(stream, {
       headers: {
-        'Content-Type': 'text/event-stream; charset=utf-8',
-        'Connection': 'keep-alive',
+        'Content-Type': 'text/event-stream',
         'Cache-Control': 'no-cache',
-        'Transfer-Encoding': 'chunked',
+        'Connection': 'keep-alive',
       },
     });
+
   } catch (error) {
     console.error('Error creating application:', error);
     return NextResponse.json(
