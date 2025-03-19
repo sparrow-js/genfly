@@ -4,7 +4,6 @@ import { updateFileList } from '@/utils/machines';
 import { auth } from 'auth';
 
 
-export const runtime = 'edge';
 export async function POST(request: Request) {
   try {
     // Parse the request body
