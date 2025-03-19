@@ -240,6 +240,14 @@ export const updateFileList = async (appName: string, files: Array<{path: string
 
     const execUrl = `https://api.machines.dev/v1/apps/${appName}/machines/${machine.id}/exec`;
     const filePath = files.map((file: any) => file.path);
+
+
+    // 如果有package.json文件，重新安装依赖
+    const hasPackageJson = filePath.find((key: any) => key.includes('package.json'));
+    if (hasPackageJson || installDependencies) {
+        const reinstallResult = await reinstallDependencies(appName, installDependencies, hasPackageJson);
+        console.log('Reinstall dependencies result:', reinstallResult);
+    }
     
     // 创建基于文件大小的批次
     const MAX_BATCH_SIZE_KB = 15; // 最大批次大小，单位KB
@@ -465,12 +473,7 @@ export const updateFileList = async (appName: string, files: Array<{path: string
     
     console.log(`Processed ${totalProcessed}/${files.length} files, success: ${allSuccessful}`);
     
-    // 如果有package.json文件，重新安装依赖
-    const hasPackageJson = filePath.find((key: any) => key.includes('package.json'));
-    if (hasPackageJson || installDependencies) {
-        const reinstallResult = await reinstallDependencies(appName, installDependencies, hasPackageJson);
-        console.log('Reinstall dependencies result:', reinstallResult);
-    }
+
     
     return allSuccessful;
 };
