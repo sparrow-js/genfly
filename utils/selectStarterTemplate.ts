@@ -183,7 +183,12 @@ export async function getTemplates(templateName: string, title?: string) {
   }
 
   const githubRepo = template.githubRepo;
-  const files = await getGitHubRepoContent(githubRepo);
+  // const files = await getGitHubRepoContent(githubRepo);
+  const response = await fetch('/api/git/getGitHubRepoContent', {
+    method: 'POST',
+    body: JSON.stringify({ repoName: githubRepo }),
+  });
+  const files = await response.json();
 
   let filteredFiles = files;
 
@@ -191,17 +196,17 @@ export async function getTemplates(templateName: string, title?: string) {
    * ignoring common unwanted files
    * exclude    .git
    */
-  filteredFiles = filteredFiles.filter((x) => x.path.startsWith('.git') == false);
+  filteredFiles = filteredFiles.filter((x: any) => x.path.startsWith('.git') == false);
 
   // exclude    lock files
   const comminLockFiles = ['package-lock.json', 'yarn.lock', 'pnpm-lock.yaml'];
-  filteredFiles = filteredFiles.filter((x) => comminLockFiles.includes(x.name) == false);
+  filteredFiles = filteredFiles.filter((x: any) => comminLockFiles.includes(x.name) == false);
 
   // exclude    .bolt
-  filteredFiles = filteredFiles.filter((x) => x.path.startsWith('.bolt') == false);
+  filteredFiles = filteredFiles.filter((x: any) => x.path.startsWith('.bolt') == false);
 
   // check for ignore file in .bolt folder
-  const templateIgnoreFile = files.find((x) => x.path.startsWith('.bolt') && x.name == 'ignore');
+  const templateIgnoreFile = files.find((x: any) => x.path.startsWith('.bolt') && x.name == 'ignore');
 
   const filesToImport = {
     files: filteredFiles,
@@ -210,11 +215,11 @@ export async function getTemplates(templateName: string, title?: string) {
 
   if (templateIgnoreFile) {
     // redacting files specified in ignore file
-    const ignorepatterns = templateIgnoreFile.content.split('\n').map((x) => x.trim());
+    const ignorepatterns = templateIgnoreFile.content.split('\n').map((x: any) => x.trim());
     const ig = ignore().add(ignorepatterns);
 
     // filteredFiles = filteredFiles.filter(x => !ig.ignores(x.path))
-    const ignoredFiles = filteredFiles.filter((x) => ig.ignores(x.path));
+    const ignoredFiles = filteredFiles.filter((x: any) => ig.ignores(x.path));
 
     filesToImport.files = filteredFiles;
     filesToImport.ignoreFile = ignoredFiles;
@@ -225,7 +230,7 @@ export async function getTemplates(templateName: string, title?: string) {
 <boltArtifact id="imported-files" title="${title || 'Importing Starter Files'}" type="bundled">
 ${filesToImport.files
   .map(
-    (file) =>
+    (file: any) =>
       `<boltAction type="file" filePath="${file.path}">
 ${file.content}
 </boltAction>`,
@@ -234,7 +239,7 @@ ${file.content}
 </boltArtifact>
 `;
   let userMessage = ``;
-  const templatePromptFile = files.filter((x) => x.path.startsWith('.bolt')).find((x) => x.name == 'prompt');
+  const templatePromptFile = files.filter((x: any) => x.path.startsWith('.bolt')).find((x: any) => x.name == 'prompt');
 
   if (templatePromptFile) {
     userMessage = `
@@ -253,7 +258,7 @@ IMPORTANT: Dont Forget to install the dependencies before running the app
 STRICT FILE ACCESS RULES - READ CAREFULLY:
 
 The following files are READ-ONLY and must never be modified:
-${filesToImport.ignoreFile.map((file) => `- ${file.path}`).join('\n')}
+${filesToImport.ignoreFile.map((file: any) => `- ${file.path}`).join('\n')}
 
 Permitted actions:
 ✓ Import these files as dependencies
