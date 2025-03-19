@@ -244,8 +244,8 @@ export const updateFileList = async (appName: string, files: Array<{path: string
 
     // 如果有package.json文件，重新安装依赖
     const hasPackageJson = filePath.find((key: any) => key.includes('package.json'));
-    if (hasPackageJson || installDependencies) {
-        const reinstallResult = await reinstallDependencies(appName, installDependencies, hasPackageJson);
+    if (!hasPackageJson && installDependencies) {
+        const reinstallResult = await reinstallDependencies(appName, installDependencies, hasPackageJson, machine);
         console.log('Reinstall dependencies result:', reinstallResult);
     }
     
@@ -449,7 +449,7 @@ export const updateFileList = async (appName: string, files: Array<{path: string
                 // 在批次之间添加延迟，避免API限制
                 if (i < batches.length - 1) {
                     console.log(`Adding delay between batches (2 second)`);
-                    await new Promise(resolve => setTimeout(resolve, 5000));
+                    await new Promise(resolve => setTimeout(resolve, 4000));
                 }
             } catch (error) {
                 console.error(`Error processing batch ${i+1}:`, error);
@@ -473,7 +473,11 @@ export const updateFileList = async (appName: string, files: Array<{path: string
     
     console.log(`Processed ${totalProcessed}/${files.length} files, success: ${allSuccessful}`);
     
-
+    if (hasPackageJson) {
+        const reinstallResult = await reinstallDependencies(appName, installDependencies, hasPackageJson, machine);
+        console.log('Reinstall dependencies result:', reinstallResult);
+    }
+    
     
     return allSuccessful;
 };
@@ -689,13 +693,8 @@ export const executeCommand = async (appId: string, machineId: string, command: 
   }
 };
 
-export const reinstallDependencies = async (appId: string, installDependencies: string, hasPackageJson: boolean) => {
+export const reinstallDependencies = async (appId: string, installDependencies: string, hasPackageJson: boolean, machine: any) => {
   try {
-    const machine = await getMachine(appId);
-    if (!machine) {
-      throw new Error('No machine found for the application');
-    }
-    
     // Execute npm install with retry logic
     let installResult: any;
     
@@ -708,8 +707,9 @@ export const reinstallDependencies = async (appId: string, installDependencies: 
         installCommand = installDependencies;
       }
 
+      console.log('installCommand', ['sh', '-c', `cd /app && ${installCommand}`]);
       // Run npm install in the app directory
-      installResult = await executeCommand(appId, machine.id, ['sh', '-c', 'cd /app && npm install']);
+      installResult = await executeCommand(appId, machine.id, ['sh', '-c', `cd /app && ${installCommand}`]);
             
       // If we get here, the command succeeded or had non-fatal warnings
     } catch (error) {

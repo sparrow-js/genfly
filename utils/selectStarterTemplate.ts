@@ -183,13 +183,12 @@ export async function getTemplates(templateName: string, title?: string) {
   }
 
   const githubRepo = template.githubRepo;
-  // const files = await getGitHubRepoContent(githubRepo);
-  const response = await fetch('/api/git/getGitHubRepoContent', {
-    method: 'POST',
-    body: JSON.stringify({ repoName: githubRepo }),
-  });
-  const files = await response.json();
-
+  const files = await getGitHubRepoContent(githubRepo);
+  // const response = await fetch('/api/git/getGitHubRepoContent', {
+  //   method: 'POST',
+  //   body: JSON.stringify({ repoName: githubRepo }),
+  // });
+  // const files = await response.json();
   let filteredFiles = files;
 
   /*
