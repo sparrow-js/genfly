@@ -30,6 +30,11 @@ export async function POST(request: Request) {
         })} \n\n`,
       );
     }
+
+    noticeHost({
+      event: 'start',
+      message: 'Updating file list...',
+    });
     
 
     updateFileList(
@@ -45,17 +50,12 @@ export async function POST(request: Request) {
         result: result,
       });
     })
-    .finally(() => {
-      writer.close();
+    .finally(async () => {
+      await writer.close();
     });
+    
 
-    return new Response(responseStream.readable, {
-      headers: {
-        "Content-Type": "text/event-stream",
-        "Cache-Control": "no-cache",
-        Connection: "keep-alive",
-      },
-    });
+    return new Response(responseStream.readable);
   } catch (error) {
     console.error('Error creating application:', error);
     return NextResponse.json(
