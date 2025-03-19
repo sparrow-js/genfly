@@ -2,7 +2,7 @@
 import { NextResponse } from 'next/server';
 import { updateFileList } from '@/utils/machines';
 import { auth } from 'auth';
-export const maxDuration = 300;
+
 
 export const runtime = 'edge';
 export async function POST(request: Request) {

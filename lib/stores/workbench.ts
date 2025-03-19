@@ -641,9 +641,9 @@ export class WorkbenchStore {
           if (done) break;
 
           const text = decoder.decode(value, { stream: true });
+          console.log('************** data: ', text);
           try {
             const lines = text.split("\n");
-            console.log('data: ', text);
             for (const line of lines) {
               if (line.startsWith('data:')) {
                 const data = JSON.parse(line.substring(6)) as Record<string, any>; // remove data: and parse as json
