@@ -198,6 +198,15 @@ export class StreamingMessageParser {
               });
             }
 
+            if ('type' in currentAction && currentAction.type === 'shell') {
+              this._options.callbacks?.onActionStream?.({
+                artifactId: currentArtifact.id,
+                messageId,
+                actionId: String(state.actionId - 1),
+                action: currentAction as BoltAction,
+              });
+            }
+
             break;
           }
         } else {

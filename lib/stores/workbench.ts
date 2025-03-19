@@ -591,6 +591,8 @@ export class WorkbenchStore {
 
   async uploadFilesTomachine(files: { path: string, content: string }[], installDependencies: string) {
 
+    console.log('uploadFilesTomachine ************** installDependencies', installDependencies);
+
     try {
         this.currentView.set('preview');
         const response = await fetch('/api/updatefilelist', {

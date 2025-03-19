@@ -237,6 +237,12 @@ export class ActionRunner {
   }
 
   async #runShellAction(action: ActionState) {
+    if (workbenchStore.startStreaming.get() === true) {
+      if (action.content.includes('npm install')) {
+        workbenchStore.installDependencies.set(action.content);
+      }
+    }
+
     // if (action.type !== 'shell') {
     //   unreachable('Expected shell action');
     // }
