@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { updateFileList } from '@/utils/machines';
 import { auth } from 'auth';
 
+export const runtime = 'edge';
 
 export async function POST(request: Request) {
   try {
@@ -46,6 +47,7 @@ export async function POST(request: Request) {
         await noticeHost(result);
       })
     .then(async(result) => {
+      console.log('result ***************6666');
       await noticeHost({
         event: 'complete',
         result: result,

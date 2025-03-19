@@ -15,7 +15,6 @@ function arrayBufferToBase64(buffer: any) {
 
 const flyToken = process.env.FLY_API_TOKEN;
 
-
 export const createFlyApp = async (appName: string) => {
     const response = await fetch('https://api.machines.dev/v1/apps', {
         method: 'POST',
