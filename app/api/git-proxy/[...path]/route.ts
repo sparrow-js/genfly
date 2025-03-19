@@ -1,9 +1,13 @@
 // app/api/proxy/[...path]/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function handler(request: NextRequest, { params }: { params: { path: string[] } }) {
+export const runtime = 'edge';
+
+async function handler(request: NextRequest, 
+  { params }: { params: Promise<{ path: string[] }> } // 类型定义
+) {
   try {
-    const path = params.path?.join('/'); // Join catch-all segments into a single string
+    const { path } = await params; // 从 params 中获取 id
 
     if (!path) {
       return NextResponse.json({ error: 'Invalid proxy URL format' }, { status: 400 });
@@ -57,8 +61,8 @@ export async function handler(request: NextRequest, { params }: { params: { path
 }
 
 // Export handlers for all HTTP methods
-export const GET = handler;
-export const POST = handler;
-export const PUT = handler;
-export const DELETE = handler;
-export const OPTIONS = handler;
+export const GET = (request: NextRequest, context: { params: Promise<{ path: string[] }> }) => handler(request, context);
+export const POST = (request: NextRequest, context: { params: Promise<{ path: string[] }> }) => handler(request, context);
+export const PUT = (request: NextRequest, context: { params: Promise<{ path: string[] }> }) => handler(request, context);
+export const DELETE = (request: NextRequest, context: { params: Promise<{ path: string[] }> }) => handler(request, context);
+export const OPTIONS = (request: NextRequest, context: { params: Promise<{ path: string[] }> }) => handler(request, context);
