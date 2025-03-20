@@ -8,7 +8,7 @@ interface IdeaShortcutProps {
 const ideas = [
     {
         label: 'cafe Landing page',
-        content: `A landing page for a cafe with a modern design. Include a menu section with a search bar and a filter by category. Just the UI first.`
+        content: `A landing page for a cafe with a modern design.`
     },
     {
         label: 'Weather dashboard',
