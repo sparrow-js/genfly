@@ -80,15 +80,19 @@ export const Menu = () => {
 
   const { data: session, status } = useSession();
   
+  
+  const getCredits = async () => {
+    const responseCredits = await fetch('/api/usage/get-credits');
+    if (!responseCredits.ok) throw new Error('Failed to fetch credits');
+    const creditsData = await responseCredits.json();
+    setCredits(creditsData.credits);
+  }
 
 
   const loadEntries = useCallback(async () => {
     try {
 
-      const responseCredits = await fetch('/api/usage/get-credits');
-      if (!responseCredits.ok) throw new Error('Failed to fetch credits');
-      const creditsData = await responseCredits.json();
-      setCredits(creditsData.credits);
+      getCredits();
 
       const response = await fetch('/api/chats');
       if (!response.ok) throw new Error('Failed to fetch chats');
