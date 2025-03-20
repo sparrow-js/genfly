@@ -27,18 +27,18 @@ export default class AnthropicProvider extends BaseProvider {
       provider: 'Anthropic',
       maxTokenAllowed: 8000,
     },
-    {
-      name: 'anthropic/claude-3.5-sonnet-20240620',
-      label: 'Claude 3.5 Sonnet (old)',
-      provider: 'Anthropic',
-      maxTokenAllowed: 8000,
-    },
-    {
-      name: 'anthropic/claude-3.5-haiku',
-      label: 'Claude 3.5 Haiku (new)',
-      provider: 'Anthropic',
-      maxTokenAllowed: 8000,
-    },
+    // {
+    //   name: 'anthropic/claude-3.5-sonnet-20240620',
+    //   label: 'Claude 3.5 Sonnet (old)',
+    //   provider: 'Anthropic',
+    //   maxTokenAllowed: 8000,
+    // },
+    // {
+    //   name: 'anthropic/claude-3.5-haiku',
+    //   label: 'Claude 3.5 Haiku (new)',
+    //   provider: 'Anthropic',
+    //   maxTokenAllowed: 8000,
+    // },
   ];
   getModelInstance: (options: {
     model: string;
