@@ -53,7 +53,7 @@ export default function LoginPage() {
           </div>
           
           <p className="text-gray-500 text-sm mt-10 text-center">
-            By signing in, you agree to our <a href="#" className="text-gray-400 hover:text-white transition-colors underline decoration-dotted underline-offset-2">Terms of Service</a> and <a href="#" className="text-gray-400 hover:text-white transition-colors underline decoration-dotted underline-offset-2">Privacy Policy</a>
+            By signing in, you agree to our <a href="/terms" className="text-gray-400 hover:text-white transition-colors underline decoration-dotted underline-offset-2">Terms of Service</a> and <a href="/privacy-policy" className="text-gray-400 hover:text-white transition-colors underline decoration-dotted underline-offset-2">Privacy Policy</a>
           </p>
         </div>
       </div>
