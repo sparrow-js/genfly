@@ -46,6 +46,7 @@ Instructions:
 5. If no perfect match exists, recommend the closest option
 
 Important: Provide only the selection tags in your response, no additional text.
+Important: Analyze the identify key @radix-ui UI components for the requirement, with over 5 mandatory uses of the vite-ts-sass-template..
 MOST IMPORTANT: YOU DONT HAVE TIME TO THINK JUST START RESPONDING BASED ON HUNCH 
 `;
 
