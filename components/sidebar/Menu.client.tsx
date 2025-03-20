@@ -70,6 +70,7 @@ export const Menu = () => {
   const [open, setOpen] = useState(false);
   const [dialogContent, setDialogContent] = useState<DialogContent>(null);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+  const [credits, setCredits] = useState(0);
   const profile = useStore(profileStore);
 
   const { filteredItems: filteredList, handleSearchChange } = useSearchFilter({
@@ -83,6 +84,12 @@ export const Menu = () => {
 
   const loadEntries = useCallback(async () => {
     try {
+
+      const responseCredits = await fetch('/api/usage/get-credits');
+      if (!responseCredits.ok) throw new Error('Failed to fetch credits');
+      const creditsData = await responseCredits.json();
+      setCredits(creditsData.credits);
+
       const response = await fetch('/api/chats');
       if (!response.ok) throw new Error('Failed to fetch chats');
       
@@ -330,6 +337,25 @@ export const Menu = () => {
             </DialogRoot>
           </div>
           <div className="flex flex-col">
+
+            {session?.user && (
+              <div className="bg-bolt-elements-background-depth-1 border-t border-bolt-elements-borderColor overflow-hidden p-2">
+                <Button 
+                  className="flex flex-row justify-start! gap-2 p-2 rounded-lg w-full text-gray-700 dark:text-white hover:text-gray-900 dark:hover:text-white hover:bg-gray-50/80 dark:hover:bg-gray-600/80" 
+                  variant="ghost"
+                  onClick={() => {}}
+                >
+                  <span className="i-ph:coin text-lg" />
+                  <div className="flex justify-between w-full">
+                    <span>Credits</span>
+                    <span className="text-sm font-medium bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded-full">
+                      {credits}
+                    </span>
+                  </div>
+                </Button>
+              </div>
+            )}
+            
             {
               session?.user && (
                 <div className="bg-bolt-elements-background-depth-1 border-t border-bolt-elements-borderColor overflow-hidden p-2">

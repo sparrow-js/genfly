@@ -6,7 +6,7 @@ import Google from "next-auth/providers/google"
 import { DrizzleAdapter } from "@auth/drizzle-adapter"
 import Notion from "next-auth/providers/notion"
 import { db } from "./db"
-import { usage } from "./db/schema"
+import { credits } from "./db/schema"
 
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -60,9 +60,10 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   events: {
     async createUser({ user }) {
       if (!user.id) return;
-      await db.insert(usage).values({
+      await db.insert(credits).values({
         userId: user.id,
         credits: 5,
+        usage: 0,
         modelName: "default",
         provider: "default"
       })
