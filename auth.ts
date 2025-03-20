@@ -6,6 +6,7 @@ import Google from "next-auth/providers/google"
 import { DrizzleAdapter } from "@auth/drizzle-adapter"
 import Notion from "next-auth/providers/notion"
 import { db } from "./db"
+import { usage } from "./db/schema"
 
 
 export const { handlers, auth, signIn, signOut } = NextAuth({
@@ -55,6 +56,17 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       };
       return session;
     },
+  },
+  events: {
+    async createUser({ user }) {
+      if (!user.id) return;
+      await db.insert(usage).values({
+        userId: user.id,
+        credits: 5,
+        modelName: "default",
+        provider: "default"
+      })
+    }
   },
   experimental: { enableWebAuthn: true },
 })

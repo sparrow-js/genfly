@@ -108,3 +108,18 @@ export const authenticators = pgTable(
     },
   ]
 )
+
+
+export const usage = pgTable(
+  "usage",
+  {
+    id: uuid('id').primaryKey().defaultRandom(),
+    userId: text("userId")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    credits: integer("credits").notNull().default(0),
+    modelName: text("modelName"),
+    provider: text("provider"),
+    createdAt: timestamp("createdAt", { mode: "date" }).notNull().defaultNow(),
+  }
+)
