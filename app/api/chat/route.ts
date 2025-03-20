@@ -13,6 +13,9 @@ import { WORK_DIR } from '@/utils/constants';
 import { createSummary } from '@/lib/.server/llm/create-summary';
 import { extractPropertiesFromMessage } from '@/lib/.server/llm/utils';
 import { auth } from 'auth';
+import { withDb } from '@/db';
+import { credits } from '@/db/schema';
+import { eq, and, sql } from 'drizzle-orm';
 
 const logger = createScopedLogger('api.chat');
 
@@ -46,10 +49,35 @@ export async function POST(request: Request) {
   };
 
   const session = await auth();
-  if (!session) {
+  const userId = session?.user?.id;
+  if (!userId) {
     return new Response('Unauthorized', {
       status: 401,
       headers: { 'Content-Type': 'text/plain' },
+    });
+  }
+
+  const result = await withDb(db => db.update(credits)
+    .set({
+      usage: sql`${credits.usage} + 1`
+    })
+    .where(
+      and(
+        eq(credits.userId, userId),
+        sql`${credits.credits} - ${credits.usage} > 0`
+      )
+    )
+    .returning({
+      updated: sql`1`
+    })
+  );
+
+  if (!result.length) {
+    return new Response(JSON.stringify({
+       error: 'Insufficient credits'
+      }), {
+      status: 403,
+      headers: { 'Content-Type': 'application/json' },
     });
   }
 

@@ -91,7 +91,6 @@ export const Menu = () => {
 
   const loadEntries = useCallback(async () => {
     try {
-
       getCredits();
 
       const response = await fetch('/api/chats');
