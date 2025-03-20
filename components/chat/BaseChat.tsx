@@ -305,6 +305,12 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
       }
     };
 
+    const checkCredits = async () => {
+      const credits = await fetch('/api/usage/get-credits');
+      const creditsData = await credits.json();
+      return creditsData.credits;
+    }
+
     const baseChat = (
       <div
         ref={ref}
@@ -478,7 +484,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                           }
                         });
                       }}
-                      onKeyDown={(event) => {
+                      onKeyDown={async (event) => {
                         if (event.key === 'Enter') {
                           if (event.shiftKey) {
                             return;
@@ -501,6 +507,13 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                             return;
                           }
 
+                          const credits = await checkCredits();
+
+                            if (credits <= 0) {
+                              toast.error('No credits left');
+                              return;
+                            }
+
 
                           handleSendMessage?.(event);
                         }
@@ -521,7 +534,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                           show={input.length > 0 || isStreaming || uploadedFiles.length > 0}
                           isStreaming={isStreaming}
                           disabled={!providerList || providerList.length === 0}
-                          onClick={(event) => {
+                          onClick={async (event) => {
 
                             if(!session) {
                               setShowLoginModal(true);
@@ -532,6 +545,14 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                               handleStop?.();
                               return;
                             }
+
+                            const credits = await checkCredits();
+
+                            if (credits <= 0) {
+                              toast.error('No credits left');
+                              return;
+                            }
+
 
                             if (input.length > 0 || uploadedFiles.length > 0) {
                               handleSendMessage?.(event);
