@@ -40,6 +40,7 @@ import { ClientOnly } from '@/components/ClientOnly';
 import { SidebarLeft } from '@/components/sidebar/left';
 import { useSession } from "next-auth/react"
 import { LoginModal } from '@/components/auth/LoginModal';
+import IdeaShortcut from './IdeaShortcut';
 
 
 const TEXTAREA_MIN_HEIGHT = 76;
@@ -608,7 +609,7 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                       </div>
                       {input.length > 3 ? (
                         <div className="text-xs text-bolt-elements-textTertiary">
-                          Use <kbd className="kdb px-1.5 py-0.5 rounded bg-bolt-elements-background-depth-2">Shift</kbd>{' '}
+                          <kbd className="kdb px-1.5 py-0.5 rounded bg-bolt-elements-background-depth-2">Shift</kbd>{' '}
                           + <kbd className="kdb px-1.5 py-0.5 rounded bg-bolt-elements-background-depth-2">Return</kbd>{' '}
                           a new line
                         </div>
@@ -616,6 +617,32 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                     </div>
                   </div>
                 </div>
+                {!chatStarted && (
+                  <IdeaShortcut onSelect={(idea) => {
+                    if (idea && textareaRef?.current) {
+                      const newValue = idea;
+                      
+                      // Update the textarea value
+                      textareaRef.current.value = newValue;
+                      
+                      // Trigger input change to update state
+                      const event = new Event('input', { bubbles: true });
+                      textareaRef.current.dispatchEvent(event);
+                      
+                      // If handleInputChange is available, call it directly
+                      if (handleInputChange) {
+                        const syntheticEvent = {
+                          target: textareaRef.current,
+                          currentTarget: textareaRef.current
+                        } as React.ChangeEvent<HTMLTextAreaElement>;
+                        handleInputChange(syntheticEvent);
+                      }
+                      
+                      // Focus the textarea
+                      textareaRef.current.focus();
+                    }
+                  }} />
+                )}
               </div>
             </div>
             {!chatStarted && (

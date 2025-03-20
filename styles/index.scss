@@ -38,3 +38,11 @@ body {
 // [data-theme="dark"] canvas {
 //   background-color: #000000 !important;
 // }
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollbar-hide {
+  scrollbar-width: none;
+}
