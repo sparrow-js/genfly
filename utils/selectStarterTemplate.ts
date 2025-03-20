@@ -46,7 +46,7 @@ Instructions:
 5. If no perfect match exists, recommend the closest option
 
 Important: Provide only the selection tags in your response, no additional text.
-Important: Analyze the identify key @radix-ui UI components for the requirement, with over 5 mandatory uses of the vite-ts-sass-template..
+Important: Analyze the foundational UI components required for use. If more than 5 components from @radix-ui are needed, it is mandatory to use the template vite-ts-sass-template, disregarding the recommended template list.
 MOST IMPORTANT: YOU DONT HAVE TIME TO THINK JUST START RESPONDING BASED ON HUNCH 
 `;
 
@@ -71,6 +71,7 @@ const parseSelectedTemplate = (llmOutput: string): { template: string; title: st
 
 export const selectStarterTemplate = async (options: { message: string; model: string; provider: ProviderInfo }) => {
   const { message, model, provider } = options;
+  console.log('system message ************', starterTemplateSelectionPrompt(templates));
   const requestBody = {
     message,
     model,
