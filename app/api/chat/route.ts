@@ -74,7 +74,7 @@ export async function POST(request: Request) {
 
   if (!result.length) {
     return new Response(JSON.stringify({
-       error: 'Insufficient credits'
+       error: 'No credits left'
       }), {
       status: 403,
       headers: { 'Content-Type': 'application/json' },
