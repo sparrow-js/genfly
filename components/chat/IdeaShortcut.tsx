@@ -17,16 +17,20 @@ const ideas = [
 Let the user add their own API key in a local storage backed input and link to where to get the key, I'll add Supabase and my own API key there later.`
     },
     {
+        label: 'Social media feed',
+        content: `A social media feed with posts, likes, comments and infinite scroll. Include a stories feature at the top like Instagram. Just the UI first, I'll add Supabase for the backend later.`
+    },
+    {
+        label: 'Habit tracking app',
+        content: `A minimal habit tracking app with daily streaks, monthly view and progress insights. Include habit categories and achievement badges.`
+    },
+    {
         label: 'E-commerce product page',
         content: `A modern e-commerce product page with image gallery, size/color variants, reviews section and related products. Focus on the UI/UX first, I'll integrate Supabase for product data later.`
     },
     {
         label: 'Task management app',
         content: `A task management app with categories, due dates, and priority levels. Include a calendar view and list view. Just the UI first, I'll add Supabase for data persistence later.`
-    },
-    {
-        label: '3D product viewer',
-        content: `A 3D product viewer using react-three-fiber. Add a sample 3D model.`
     },
     {
         label: 'Remotion video',
