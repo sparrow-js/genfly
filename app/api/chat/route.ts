@@ -57,34 +57,29 @@ export async function POST(request: Request) {
     });
   }
 
-  const userCredits = await withDb(db => db.select(
-    {
-      id: credits.id,
-      userId: credits.userId,
-      credits: credits.credits,
-      usage: credits.usage
+  const result = await withDb(db => db.update(credits)
+    .set({
+      usage: sql`${credits.usage} + 1`
     })
-    .from(credits)
-    .where(eq(credits.userId, userId))
-    .limit(1)
+    .where(
+      and(
+        eq(credits.userId, userId),
+        sql`${credits.credits} - ${credits.usage} > 0`
+      )
+    )
+    .returning({
+      updated: sql`1`
+    })
   );
 
-  if (userCredits.length === 0 || (userCredits[0].credits - userCredits[0].usage) <= 0) {
-    return NextResponse.json({
-      error: 'no credits'
-    }, {
+  if (!result.length) {
+    return new Response(JSON.stringify({
+       error: 'Insufficient credits'
+      }), {
       status: 403,
       headers: { 'Content-Type': 'application/json' },
     });
   }
-
-  await withDb(db => db.update(credits)
-    .set({
-      usage: userCredits[0].usage + 1
-    })
-    .where(eq(credits.userId, userId))
-  );
-
 
   const cookieHeader = request.headers.get('Cookie');
   const apiKeys = JSON.parse(parseCookies(cookieHeader)?.apiKeys || '{}');
