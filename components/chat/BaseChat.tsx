@@ -642,10 +642,18 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
           <Workbench chatStarted={chatStarted} isStreaming={isStreaming} sendMessage={sendMessage} />
         </div>
         <LoginModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
-          {!chatStarted && <div className="absolute bottom-2 right-4 flex gap-4 text-sm">
-            <a href="/terms" className="dark:text-white text-black hover:opacity-80">Terms & Conditions</a>
-            <a href="/privacy-policy" className="dark:text-white text-black hover:opacity-80">Privacy Policy</a>
-          </div>}
+
+
+        {!chatStarted && <div className="absolute bottom-2 right-4 flex gap-4 text-sm">
+          <a href="https://github.com/sparrow-js/an-codeAI" target="_blank" rel="noopener noreferrer" className="dark:text-white text-black hover:opacity-80">
+            <div className="flex items-center gap-1">
+              <div className="i-ph:github-logo text-lg" />
+              GitHub
+            </div>
+          </a>
+          <a href="/terms" className="dark:text-white text-black hover:opacity-80">Terms & Conditions</a>
+          <a href="/privacy-policy" className="dark:text-white text-black hover:opacity-80">Privacy Policy</a>
+        </div>}
       </div>
     );
 
