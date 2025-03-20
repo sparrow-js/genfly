@@ -651,7 +651,9 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
               GitHub
             </div>
           </a>
+          <span className="dark:text-white text-black">·</span>
           <a href="/terms" className="dark:text-white text-black hover:opacity-80">Terms & Conditions</a>
+          <span className="dark:text-white text-black">·</span>
           <a href="/privacy-policy" className="dark:text-white text-black hover:opacity-80">Privacy Policy</a>
         </div>}
       </div>
