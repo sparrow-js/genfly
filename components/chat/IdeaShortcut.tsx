@@ -12,7 +12,7 @@ const ideas = [
     },
     {
         label: 'Social media feed',
-        content: `A social media feed with posts, likes, comments and infinite scroll. Include a stories feature at the top like Instagram. Just the UI first, I'll add Supabase for the backend later.`
+        content: `A social media feed with posts, likes, comments and infinite scroll. Include a stories feature at the top like Instagram. Just the UI first.`
     },
     {
         label: 'Habit tracking app',
