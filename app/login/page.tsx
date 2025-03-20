@@ -2,7 +2,7 @@ import Image from "next/image";
 import { Suspense } from "react";
 import LoginGithubButton from "./login-git-button";
 import LoginGoogleButton from "./login-google-button";
-import LoginNotionButton from "./login-notion-button";
+// import LoginNotionButton from "./login-notion-button";
 
 export default function LoginPage() {
   return (
@@ -43,13 +43,13 @@ export default function LoginPage() {
               <LoginGithubButton className="w-full flex items-center justify-center space-x-3 py-4 px-5 bg-white/5 hover:bg-white/10 rounded-xl text-white border border-white/10 transition-all duration-200 shadow-lg shadow-black/10 backdrop-blur-sm" />
             </Suspense>
 
-            <Suspense
+            {/* <Suspense
               fallback={
                 <div className="h-14 w-full rounded-xl bg-gray-800/50 animate-pulse" />
               }
             >
               <LoginNotionButton className="w-full flex items-center justify-center space-x-3 py-4 px-5 bg-white/5 hover:bg-white/10 rounded-xl text-white border border-white/10 transition-all duration-200 shadow-lg shadow-black/10 backdrop-blur-sm" />
-            </Suspense>
+            </Suspense> */}
           </div>
           
           <p className="text-gray-500 text-sm mt-10 text-center">
