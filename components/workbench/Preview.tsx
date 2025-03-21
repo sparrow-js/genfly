@@ -118,7 +118,6 @@ export const Preview = memo(({ sendMessage }: PreviewProps) => {
     const messageHandler = (e: any) => {
       if (e.data?.error) {
         setIsError(true);
-        console.log('error **********', e.data.error);
         if(Array.isArray(e.data.error)){
           setErrorLogs([e.data.error[0].stack || e.data.error[0].message]);
         } else {
@@ -699,7 +698,6 @@ export const Preview = memo(({ sendMessage }: PreviewProps) => {
                   
                   <button 
                     onClick={() => {
-                      console.log('logs **********', errorLogs);
                       setIsErrorLogsOpen(!isErrorLogsOpen);
                     }}
                     className="px-3 py-1.5 bg-[rgba(255,255,255,0.1)] text-white rounded-lg flex items-center gap-2 w-[120px] place-content-between text-sm hover:bg-[rgba(255,255,255,0.2)] transition-colors"
