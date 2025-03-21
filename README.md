@@ -1,6 +1,8 @@
 # genfly.dev
 
 
+[![genfly.dev: AI-Powered Full-Stack Web Development in the Browser](https://github.com/user-attachments/assets/14958a7b-280e-4c64-91de-733187a82eaa)](https://genfly.dev)
+
 Welcome to genfly.dev, an open-source AI-powered code generation tool that provides an isolated sandbox environment preview for each generated application
 
 -----
