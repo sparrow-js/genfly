@@ -12,8 +12,7 @@ const ideas = [
     },
     {
         label: 'Job board',
-        content: `
-A job board application with:
+        content: `A job board application with:
 • Search and filter by location/type
 • Company profiles
 • Job detail pages
