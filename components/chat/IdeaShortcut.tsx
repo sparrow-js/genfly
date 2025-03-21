@@ -16,8 +16,7 @@ const ideas = [
 • Search and filter by location/type
 • Company profiles
 • Job detail pages
-Just the UI first, I'll add Supabase for data persistence later.
-        `
+Just the UI first, I'll add Supabase for data persistence later.`
     },
     {
         label: 'Social media feed',
