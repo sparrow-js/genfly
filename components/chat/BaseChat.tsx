@@ -475,6 +475,12 @@ export const BaseChat = React.forwardRef<HTMLDivElement, BaseChatProps>(
                         const files = Array.from(e.dataTransfer.files);
                         files.forEach((file) => {
                           if (file.type.startsWith('image/')) {
+                            // 检查文件大小是否超过300KB
+                            if (file.size > 400 * 1024) {
+                              toast.error('Image size cannot exceed 400KB');
+                              return;
+                            }
+
                             const reader = new FileReader();
                             reader.onload = (e) => {
                               const base64Image = e.target?.result as string;

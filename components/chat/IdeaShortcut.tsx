@@ -11,6 +11,16 @@ const ideas = [
         content: `A landing page for a cafe with a modern design.`
     },
     {
+        label: 'Job board',
+        content: `
+A job board application with:
+• Search and filter by location/type
+• Company profiles
+• Job detail pages
+Just the UI first, I'll add Supabase for data persistence later.
+        `
+    },
+    {
         label: 'Social media feed',
         content: `A social media feed with posts, likes, comments and infinite scroll. Include a stories feature at the top like Instagram. Just the UI first.`
     },
@@ -32,10 +42,6 @@ Let the user add their own API key in a local storage backed input and link to w
         label: 'Task management app',
         content: `A task management app with categories, due dates, and priority levels. Include a calendar view and list view. Just the UI first, I'll add Supabase for data persistence later.`
     },
-    {
-        label: 'Remotion video',
-        content: `A dynamic video using Remotion that animates code snippets, logos and text transitions. Include smooth animations and a modern tech theme.`
-    }
 ];
 
 export default function IdeaShortcut({ onSelect }: IdeaShortcutProps) {
