@@ -27,12 +27,6 @@ Just the UI first, I'll add Supabase for data persistence later.`
         content: `A minimal habit tracking app with daily streaks, monthly view and progress insights. Include habit categories and achievement badges.`
     },
     {
-        label: 'Weather dashboard',
-        content: `A weather dashboard using OpenWeatherMap API showing current weather, 5-day forecast and city search.
-
-Let the user add their own API key in a local storage backed input and link to where to get the key, I'll add Supabase and my own API key there later.`
-    },
-    {
         label: 'E-commerce product page',
         content: `A modern e-commerce product page with image gallery, size/color variants, reviews section and related products. Focus on the UI/UX first, I'll integrate Supabase for product data later.`
     },
