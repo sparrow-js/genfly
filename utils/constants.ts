@@ -29,7 +29,7 @@ export const STARTER_TEMPLATES: Template[] = [
     name: 'vite-ts-template',
     label: 'React + Vite + typescript',
     description: 'React starter template powered by Vite for fast development experience',
-    githubRepo: 'sparrow-js/vite-ts-template',
+    githubRepo: 'wordixai/vite-ts-template',
     tags: ['react', 'vite', 'frontend'],
     icon: 'i-bolt:react',
     categorys: ['Landing Page', 'Marketing', 'Information Display']
@@ -38,7 +38,7 @@ export const STARTER_TEMPLATES: Template[] = [
     name: 'vite-ts-sass-template',
     label: 'React + Vite + typescript',
     description: 'React starter template powered by Vite for fast development experience',
-    githubRepo: 'sparrow-js/vite-ts-sass-template',
+    githubRepo: 'wordixai/vite-ts-sass-template',
     tags: ['react', 'vite', 'frontend'],
     icon: 'i-bolt:react',
     categorys: ['SaaS System', 'Cloud Management System', 'Subscription Service System', 'Dashboard System', "Productivity Tool"]
