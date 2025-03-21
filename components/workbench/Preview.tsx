@@ -119,7 +119,7 @@ export const Preview = memo(({ sendMessage }: PreviewProps) => {
       if (e.data?.error) {
         setIsError(true);
         if(Array.isArray(e.data.error)){
-          setErrorLogs([e.data.error[0].stack || e.data.error[0].message]);
+          setErrorLogs([e.data.error[0].stack || e.data.error[0].message || e.data.error[0]]);
         } else {
           setErrorLogs(e.data.error.message ? [e.data.error.message, e.data.error.stack|| ''] : e.data.error);
 
