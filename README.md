@@ -23,3 +23,10 @@ Here's a feature demonstration video of genfly.dev:
 </td>
 </tr>
 </table>
+
+## Features
+
+- AI-powered full-stack web development for NodeJS based applications directly in your browser.
+- Attach images to prompts for better contextual understanding.
+- Download projects as ZIP for easy portability Sync to a folder on the host.
+- Isolated sandbox environment for running code.
