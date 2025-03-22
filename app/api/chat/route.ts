@@ -63,12 +63,12 @@ export async function POST(request: Request) {
 
   const result = await withDb(db => db.update(credits)
     .set({
-      usage: sql`${credits.usage} + 1`
+      usage: sql`usage + 1`
     })
     .where(
       and(
         eq(credits.userId, userId),
-        sql`${credits.credits} - ${credits.usage} > 0`
+        sql`credits > usage`
       )
     )
     .returning({
