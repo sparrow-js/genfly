@@ -281,12 +281,12 @@ function newEditorState(
     extensions: [
       EditorView.domEventHandlers({
         scroll: debounce((event, view) => {
-          console.log('scroll ************', debounceScroll);
-          if (event.target !== view.scrollDOM) {
-            return;
-          }
+          // console.log('scroll ************', debounceScroll);
+          // if (event.target !== view.scrollDOM) {
+          //   return;
+          // }
 
-          onScrollRef.current?.({ left: view.scrollDOM.scrollLeft, top: view.scrollDOM.scrollTop });
+          // onScrollRef.current?.({ left: view.scrollDOM.scrollLeft, top: view.scrollDOM.scrollTop });
         }, debounceScroll),
         keydown: (event, view) => {
           if (view.state.readOnly) {
