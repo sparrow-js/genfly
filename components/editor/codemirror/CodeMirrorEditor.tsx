@@ -19,12 +19,13 @@ import {
 import { memo, useEffect, useRef, useState, type MutableRefObject } from 'react';
 import type { Theme } from '@/types/theme';
 import { classNames } from '@/utils/classNames';
-import { debounce, throttle } from '@/utils/debounce';
+import { debounce } from '@/utils/debounce';
 import { createScopedLogger, renderLogger } from '@/utils/logger';
 import { BinaryContent } from './BinaryContent';
 import { getTheme, reconfigureTheme } from './cm-theme';
 import { indentKeyBinding } from './indent';
 import { getLanguage } from './languages';
+import { throttle } from 'lodash-es';
 
 import { workbenchStore } from '@/lib/stores/workbench';
 
@@ -435,12 +436,11 @@ function setEditorDocument(
       if (scrollHeight > clientHeight) {
         view.scrollDOM.scrollTo(newLeft, newTop);
       }
-    }, 50); // 50ms 截流
+    }, 50, { leading: true, trailing: true });
 
     requestAnimationFrame(() => {
       if (workbenchStore.startStreaming.get()) {
         throttledScroll();
-        // 设置一个间隔来持续检查滚动
         const intervalId = setInterval(throttledScroll, 50);
         
         // 清理函数
