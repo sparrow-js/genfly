@@ -25,6 +25,7 @@ import { BinaryContent } from './BinaryContent';
 import { getTheme, reconfigureTheme } from './cm-theme';
 import { indentKeyBinding } from './indent';
 import { getLanguage } from './languages';
+import { workbenchStore } from '@/lib/stores/workbench';
 
 const logger = createScopedLogger('CodeMirrorEditor');
 
@@ -280,6 +281,7 @@ function newEditorState(
     extensions: [
       EditorView.domEventHandlers({
         scroll: debounce((event, view) => {
+          console.log('scroll ************', debounceScroll);
           if (event.target !== view.scrollDOM) {
             return;
           }
@@ -335,7 +337,6 @@ function newEditorState(
       }),
       closeBrackets(),
       lineNumbers(),
-      scrollPastEnd(),
       dropCursor(),
       drawSelection(),
       bracketMatching(),
@@ -383,7 +384,7 @@ function setEditorDocument(
 ) {
   if (doc.value !== view.state.doc.toString()) {
     view.dispatch({
-      selection: { anchor: 0 },
+      selection: { anchor: doc.value.length },
       changes: {
         from: 0,
         to: view.state.doc.length,
@@ -406,30 +407,35 @@ function setEditorDocument(
     });
 
     requestAnimationFrame(() => {
-      const currentLeft = view.scrollDOM.scrollLeft;
-      const currentTop = view.scrollDOM.scrollTop;
-      const newLeft = doc.scroll?.left ?? 0;
-      const newTop = doc.scroll?.top ?? 0;
-
-      const needsScrolling = currentLeft !== newLeft || currentTop !== newTop;
-
-      if (autoFocus && editable) {
-        if (needsScrolling) {
-          // we have to wait until the scroll position was changed before we can set the focus
-          view.scrollDOM.addEventListener(
-            'scroll',
-            () => {
-              view.focus();
-            },
-            { once: true },
-          );
-        } else {
-          // if the scroll position is still the same we can focus immediately
-          view.focus();
+      if (workbenchStore.startStreaming.get()) {
+        const currentLeft = view.scrollDOM.scrollLeft;
+        const scrollHeight = view.scrollDOM.scrollHeight;
+        const clientHeight = view.scrollDOM.clientHeight;
+        
+        const newTop = scrollHeight - clientHeight;
+        const newLeft = doc.scroll?.left ?? 0;
+  
+        const needsScrolling = currentLeft !== newLeft || view.scrollDOM.scrollTop !== newTop;
+  
+        if (autoFocus && editable) {
+          if (needsScrolling) {
+            view.scrollDOM.addEventListener(
+              'scroll',
+              () => {
+                view.focus();
+              },
+              { once: true },
+            );
+          } else {
+            view.focus();
+          }
+        }
+  
+        if (scrollHeight > clientHeight) {
+          view.scrollDOM.scrollTo(newLeft, newTop);
         }
       }
-
-      view.scrollDOM.scrollTo(newLeft, newTop);
+    
     });
   });
 }
