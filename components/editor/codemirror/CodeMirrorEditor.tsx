@@ -19,7 +19,7 @@ import {
 import { memo, useEffect, useRef, useState, type MutableRefObject } from 'react';
 import type { Theme } from '@/types/theme';
 import { classNames } from '@/utils/classNames';
-import { debounce } from '@/utils/debounce';
+import { debounce, throttle } from '@/utils/debounce';
 import { createScopedLogger, renderLogger } from '@/utils/logger';
 import { BinaryContent } from './BinaryContent';
 import { getTheme, reconfigureTheme } from './cm-theme';
@@ -408,35 +408,46 @@ function setEditorDocument(
       effects: [languageCompartment.reconfigure([languageSupport]), reconfigureTheme(theme)],
     });
 
+    const throttledScroll = throttle(() => {
+      const currentLeft = view.scrollDOM.scrollLeft;
+      const scrollHeight = view.scrollDOM.scrollHeight;
+      const clientHeight = view.scrollDOM.clientHeight;
+      
+      const newTop = scrollHeight - clientHeight;
+      const newLeft = doc.scroll?.left ?? 0;
+
+      const needsScrolling = currentLeft !== newLeft || view.scrollDOM.scrollTop !== newTop;
+
+      if (autoFocus && editable) {
+        if (needsScrolling) {
+          view.scrollDOM.addEventListener(
+            'scroll',
+            () => {
+              view.focus();
+            },
+            { once: true },
+          );
+        } else {
+          view.focus();
+        }
+      }
+
+      if (scrollHeight > clientHeight) {
+        view.scrollDOM.scrollTo(newLeft, newTop);
+      }
+    }, 50); // 50ms 截流
+
     requestAnimationFrame(() => {
       if (workbenchStore.startStreaming.get()) {
-        console.log('startStreaming ************');
-        const currentLeft = view.scrollDOM.scrollLeft;
-        const scrollHeight = view.scrollDOM.scrollHeight;
-        const clientHeight = view.scrollDOM.clientHeight;
+        throttledScroll();
+        // 设置一个间隔来持续检查滚动
+        const intervalId = setInterval(throttledScroll, 50);
         
-        const newTop = scrollHeight - clientHeight;
-        const newLeft = doc.scroll?.left ?? 0;
-  
-        const needsScrolling = currentLeft !== newLeft || view.scrollDOM.scrollTop !== newTop;
-  
-        if (autoFocus && editable) {
-          if (needsScrolling) {
-            view.scrollDOM.addEventListener(
-              'scroll',
-              () => {
-                view.focus();
-              },
-              { once: true },
-            );
-          } else {
-            view.focus();
-          }
-        }
-  
-        if (scrollHeight > clientHeight) {
-          view.scrollDOM.scrollTo(newLeft, newTop);
-        }
+        // 清理函数
+        return () => {
+          clearInterval(intervalId);
+          throttledScroll.cancel();
+        };
       } else {
         const currentLeft = view.scrollDOM.scrollLeft;
         const currentTop = view.scrollDOM.scrollTop;
